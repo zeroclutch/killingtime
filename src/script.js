@@ -75,6 +75,8 @@ function onResults(results) {
     document.body.classList.add('loaded');
     // Update the frame rate.
     fpsControl.tick();
+    fpsControl.tick();
+    fpsControl.tick();
     // Draw the overlays.
     canvasCtx.save();
     canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
@@ -118,7 +120,7 @@ function onResults(results) {
         // Reset if we're at the end
         if(i === cache.length - 1) i = 0
 
-        let isTriggered = triggered(results.multiHandLandmarks[0][8], results.multiHandLandmarks[0][5], results.multiHandLandmarks[0][4], results.multiHandLandmarks[0][3])
+        let isTriggered = triggered(results.multiHandLandmarks[0][8], results.multiHandLandmarks[0][0], results.multiHandLandmarks[0][4], results.multiHandLandmarks[0][3])
 
         const lm = [{'x': avgX,'y': avgY, 'z': 0}];
         drawingUtils.drawLandmarks(canvasCtx, lm, {
@@ -127,7 +129,6 @@ function onResults(results) {
             radius: 10
         });
     }
-
     canvasCtx.restore();
     if (results.multiHandWorldLandmarks) {
         // We only get to call updateLandmarks once, so we need to cook the data to
