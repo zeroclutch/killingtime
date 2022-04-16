@@ -18,7 +18,7 @@ renderer.setSize( window.innerWidth, window.innerHeight );
 document.body.appendChild( renderer.domElement );
 
 // Allow draggable controls
-let controls = new OrbitControls(camera, renderer.domElement);
+let controls = {} // new OrbitControls(camera, renderer.domElement); // Disable orbit controls
 controls.enableDamping = true;
 controls.dampingFactor = 0.25;
 controls.enableZoom = true;
@@ -77,7 +77,10 @@ const OBJECTS = [
 ]
 
 const CLOCK_TYPES = [
-    { TYPE: 0, shininess: 50, specular: new THREE.Color(0x292929), color: new THREE.Color( 0xFF0000 ) }
+    { TYPE: 0, shininess: 50, specular: new THREE.Color(0x888888), color: new THREE.Color( 0xEF0100 ) },
+    { TYPE: 1, shininess: 50, specular: new THREE.Color(0x888888), color: new THREE.Color( 0x00EF00 ) },
+    { TYPE: 2, shininess: 50, specular: new THREE.Color(0x888888), color: new THREE.Color( 0xBADA55 ) },
+    { TYPE: 3, shininess: 50, specular: new THREE.Color(0x888888), color: new THREE.Color( 0xEEBADC ) },
 ]
 
 // Current list of clocks
@@ -102,12 +105,24 @@ async function createObject(options) {
     return { object, createdAt, killAt }
 }
 
+function randomBetween(a, b) {
+    return Math.random() * (a - b) + b
+}
+
 function addObject(object, killAfter) {
+    // Adjust params 
     object.killAt = frame + (killAfter || 0)
     object.createdAt = frame
+    object.aX = randomBetween(-0.5, 0.5)
+    object.aY = randomBetween(-0.3, -0.5)
+    object.speed = randomBetween(0.3, 0.4)
+    object.height = Math.round(randomBetween(0, 150))
+
+    // Add object to scene
     scene.add(object.object);
     spawnedObjects.push(object)
-    console.log(spawnedObjects)
+
+    console.log('Spawned', spawnedObjects)
 }
 
 // Load objects
@@ -115,7 +130,6 @@ async function initializeClocks(clocksPerType) {
     for(let i = 0; i < CLOCK_TYPES.length; i++) {
         for(let j = 0; j < clocksPerType; j++) {
             let clock = await createObject({ killAfter: 100 })
-            createdObjects.push(clock)
 
             let type = CLOCK_TYPES[i]
 
@@ -126,9 +140,12 @@ async function initializeClocks(clocksPerType) {
 
             Object.assign(phongMaterial, type)
 
-            console.log(createdObjects, phongMaterial)
+            createdObjects.push(clock)
+
+            console.log(createdObjects)
         }
     }
+    return true
 }
 
 function addClock(type, duration=200) {
@@ -141,16 +158,26 @@ function addClock(type, duration=200) {
 
 ;(async function() {
     // Create all possible clocks and cache them
-    await initializeClocks(1)
+    await initializeClocks(2)
     // Add a clock of type 0 for 200 frames. If there are no clocks available, this returns false
     console.log(addClock(0, 200))
+
+    let FRAME_DELAY = 400
 
     // Animation loop
     let animate = function () {
         requestAnimationFrame( animate );
         frame++
 
-        controls.update();
+        // Spawn in a new clock
+        if(frame % FRAME_DELAY === 0) {
+            console.log(frame)
+            const clockType = Math.floor(randomBetween(0, CLOCK_TYPES.length))
+            console.log(`Adding clock ${clockType} was successful:`, addClock(clockType, 200))
+            FRAME_DELAY -= 1
+        }
+
+        // controls.update();
         renderer.render(scene, camera);
         
         // Spawns an moves
@@ -162,9 +189,8 @@ function addClock(type, duration=200) {
                 i--
                 continue
             }
-
-            const SPEED = 0.4
-            moveParabolic(object.object, -0.5, -0.5, 100, (frame - object.createdAt - 100),  SPEED)
+            
+            moveParabolic(object.object, object.aX, object.aY, object.height, (frame - object.createdAt - 100),  object.speed)
             rotateObject(object.object)
         }
     };
