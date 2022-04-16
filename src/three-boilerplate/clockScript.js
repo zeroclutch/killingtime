@@ -32,7 +32,7 @@ fillLight.position.set(100, 0, 100);
 let backLight = new THREE.DirectionalLight(0xffffff, 1.0);
 backLight.position.set(100, 0, -100).normalize();
 
-const light = new THREE.AmbientLight( 0x404040 ); // soft white light
+const light = new THREE.AmbientLight( 0x404040, 20 ); // soft white light
 
 // Add lighting
 scene.add( light );
@@ -54,7 +54,6 @@ const loadObj = (objPath, mtlPath) => {
             mtlLoader.load(mtlPath, function(materials) {
                 objLoader.setMaterials(materials);
                 objLoader.load(objPath, function (object) {
-                    scene.add(object);
                     resolve(object)
                 });
             })
@@ -62,7 +61,6 @@ const loadObj = (objPath, mtlPath) => {
 
         
         objLoader.load(objPath, function (object) {
-            scene.add(object);
             resolve(object)
         });
     })
@@ -74,22 +72,20 @@ const loadObj = (objPath, mtlPath) => {
 
 // All possible spawnable clocks
 const OBJECTS = [
-    //{ obj: 'clock2/watch_benzino_1.obj', mtl: 'clock2/watch_benzino_1.mtl', scaleX: 200, scaleY: 200, scaleZ: 200, },
-    { obj: '/clock3/Clock_obj.obj', /*mtl: '/clock3/Clock_obj.mtl',*/ scaleX: 150, scaleY: 150, scaleZ: 150,},
+    { obj: 'clock2/watch_benzino_1.obj', mtl: 'clock2/watch_benzino_1.mtl', scaleX: 50, scaleY: 50, scaleZ: 50, },
+    { obj: '/clock3/Clock_obj.obj', mtl: '/clock3/Clock_obj.mtl', scaleX: 150, scaleY: 150, scaleZ: 150,},
 ]
 
 // Current list of clocks
 const spawnedObjects = []
 
 // Spawns a new clock
-async function spawn(duration) {
+async function createObject(options) {
     // Select random object from possible list
     let data = OBJECTS[Math.floor(Math.random() * OBJECTS.length)]
     // Load object into scene
     let object = await loadObj(data.obj, data.mtl)
 
-    object.position.z = -300
-    
     // Scale object
     object.scale.x = data.scaleX
     object.scale.y = data.scaleY
@@ -97,28 +93,42 @@ async function spawn(duration) {
 
     // Add some metadata about the object
     let createdAt = frame
-    let killAt = frame + duration
-    spawnedObjects.push({ object, createdAt, killAt })
-    console.log(spawnedObjects)
+    let killAt = frame + (options.killAfter || -1) 
+    return { object, createdAt, killAt }
+}
+
+function addObject(object, killAfter) {
+    object.killAt = frame + killAfter
+    object.createdAt = frame
+    scene.add(object.object);
+    spawnedObjects.push(object)
 }
 
 ;(async function() {
     // Load objects
-    // let r2d2 = await loadObj('r2-d2.obj');
+    const OBJECT_COUNT = 5
+    const createdObjects = []
+    for(let i = 0; i < OBJECT_COUNT; i++) {
+        createdObjects.push(await createObject({ killAfter: 100 }))
+    }
+
+    addObject(createdObjects[0])
+
     // Animation loop
-    let t = -100
-    spawn(300)
     let animate = function () {
         requestAnimationFrame( animate );
-        if(Math.random() < 0.001) spawn(1000)
         frame++
 
         controls.update();
         renderer.render(scene, camera);
+
+        console.log(spawnedObjects)
         
+        // Spawns an moves
         for(let i in spawnedObjects) {
             let object = spawnedObjects[i]
-            if(frame >= object.killAt) {
+            if(frame === object.killAt ) {
+                scene.remove(object.object)
                 spawnedObjects.splice(i, 1)
                 i--
                 continue
@@ -126,9 +136,6 @@ async function spawn(duration) {
             moveParabolic(object.object, -0.5, -1, (frame - object.createdAt - 100) * 0.5)
             rotateObject(object.object)
         }
-
-        t += 0.5
-        if(t > 100) t = -100;
     };
     animate();
 })()
