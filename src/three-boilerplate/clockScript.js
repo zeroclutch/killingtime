@@ -1,6 +1,7 @@
 import * as THREE from 'three';
-import { OrbitControls } from "https://threejs.org/examples/jsm/controls/OrbitControls.js";
-import { OBJLoader } from 'https://threejs.org/examples/jsm/loaders/OBJLoader.js';
+import { OrbitControls } from "https://threejs.org/examples/jsm/controls/OrbitControls.js"
+import { OBJLoader } from 'https://threejs.org/examples/jsm/loaders/OBJLoader.js'
+import { RGBELoader } from 'https://threejs.org/examples/jsm/loaders/RGBELoader.js'
 import { MTLLoader } from 'https://threejs.org/examples/jsm/loaders/MTLLoader.js'
 
 // Add timer
@@ -44,6 +45,22 @@ scene.add(backLight);
 let objLoader = new OBJLoader();
 let mtlLoader = new MTLLoader()
 
+new RGBELoader()
+    .setDataType( THREE.FloatType )
+    .setPath( '/three-boilerplate/assets/textures/' )
+    .load( 'artist_studio_4k.hdr', function ( texture ) {
+
+    var envMap = pmremGenerator.fromEquirectangular( texture ).texture;
+
+    // scene.background = envMap;
+    scene.environment = envMap;
+
+    texture.dispose();
+    pmremGenerator.dispose();
+})
+var pmremGenerator = new THREE.PMREMGenerator( renderer );
+pmremGenerator.compileEquirectangularShader();
+
 objLoader.setPath('/three-boilerplate/assets/');
 mtlLoader.setPath('/three-boilerplate/assets/');
 
@@ -66,6 +83,49 @@ const loadObj = (objPath, mtlPath) => {
     })
 }
 
+
+
+function ExplodeAnimation(x,y)
+{
+  var geometry = new THREE.Geometry();
+  
+  for (i = 0; i < totalObjects; i ++) 
+  { 
+    var vertex = new THREE.Vector3();
+    vertex.x = x;
+    vertex.y = y;
+    vertex.z = 0;
+  
+    geometry.vertices.push( vertex );
+    dirs.push({x:(Math.random() * movementSpeed)-(movementSpeed/2),y:(Math.random() * movementSpeed)-(movementSpeed/2),z:(Math.random() * movementSpeed)-(movementSpeed/2)});
+  }
+  var material = new THREE.ParticleBasicMaterial( { size: objectSize,  color: colors[Math.round(Math.random() * colors.length)] });
+  var particles = new THREE.ParticleSystem( geometry, material );
+  
+  this.object = particles;
+  this.status = true;
+  
+  this.xDir = (Math.random() * movementSpeed)-(movementSpeed/2);
+  this.yDir = (Math.random() * movementSpeed)-(movementSpeed/2);
+  this.zDir = (Math.random() * movementSpeed)-(movementSpeed/2);
+  
+  scene.add( this.object  ); 
+  
+  this.update = function(){
+    if (this.status == true){
+      var pCount = totalObjects;
+      while(pCount--) {
+        var particle =  this.object.geometry.vertices[pCount]
+        particle.y += dirs[pCount].y;
+        particle.x += dirs[pCount].x;
+        particle.z += dirs[pCount].z;
+      }
+      this.object.geometry.verticesNeedUpdate = true;
+    }
+  }
+  
+}
+
 // const geometry = new THREE.BoxGeometry( 100, 100, 100 );
 // const material = new THREE.MeshBasicMaterial( {color: 0xff0000} );
 // const cube = new THREE.Mesh( geometry, material );
@@ -73,14 +133,13 @@ const loadObj = (objPath, mtlPath) => {
 // All possible spawnable clocks
 const OBJECTS = [
     { obj: 'blueclock/LP_Classic_Wecker.obj', mtl: 'blueclock/LP_Classic_Wecker.mtl', scaleX: 200, scaleY: 200, scaleZ: 200, },
+    // { obj: 'goldclock/LP_Classic_Wecker.obj', mtl: 'goldclock/LP_Classic_Wecker.mtl', scaleX: 200, scaleY: 200, scaleZ: 200, },
     // { obj: '/clock3/Clock_obj.obj', mtl: '/clock3/Clock_obj.mtl', scaleX: 150, scaleY: 150, scaleZ: 150,},
 ]
 
 const CLOCK_TYPES = [
-    { TYPE: 0, shininess: 50, specular: new THREE.Color(0x888888), color: new THREE.Color( 0xEF0100 ) },
-    { TYPE: 1, shininess: 50, specular: new THREE.Color(0x888888), color: new THREE.Color( 0x00EF00 ) },
-    { TYPE: 2, shininess: 50, specular: new THREE.Color(0x888888), color: new THREE.Color( 0xBADA55 ) },
-    { TYPE: 3, shininess: 50, specular: new THREE.Color(0x888888), color: new THREE.Color( 0xEEBADC ) },
+    { TYPE: 0, material: { shininess: 50, specular: new THREE.Color(0x888888), color: new THREE.Color( 0xEF0100 ) } },
+    { TYPE: 1, POINTS: 5, material: { shininess: 50, specular: new THREE.Color(0x888888), color: new THREE.Color( 0xEF0100 ) } },
 ]
 
 // Current list of clocks
@@ -118,6 +177,8 @@ function addObject(object, killAfter) {
     object.speed = randomBetween(0.3, 0.4)
     object.height = Math.round(randomBetween(0, 150))
 
+    object.x = 1000
+
     // Add object to scene
     scene.add(object.object);
     spawnedObjects.push(object)
@@ -136,13 +197,15 @@ async function initializeClocks(clocksPerType) {
             // Add specific type properties
             clock.type = type.TYPE
             const mesh = clock.object.children[0]
-            const phongMaterial = mesh.material[1]
+            let material = mesh.material[1]
 
-            Object.assign(phongMaterial, type)
+            Object.assign(material, type.material)
+            material.color = type.material.color
 
             createdObjects.push(clock)
+            
 
-            console.log(createdObjects)
+            console.log(createdObjects, material)
         }
     }
     return true
@@ -154,6 +217,12 @@ function addClock(type, duration=200) {
     if(!clock) return false
     addObject(clock, duration)
     return true
+}
+
+function killClock(i, x, y) {
+    spawnedObjects.splice(i, 1)
+    let explosion = new ExplodeAnimation(x, y)
+    setTimeout(() => scene.remove(explosion.object), 1000)
 }
 
 ;(async function() {
@@ -195,10 +264,15 @@ function addClock(type, duration=200) {
             
             moveParabolic(object.object, object.aX, object.aY, object.height, (frame - object.createdAt - 100),  object.speed)
             rotateObject(object.object)
+
+            // Detect collision
+            
         }
     };
     animate();
 })()
+
+
 
 function collisionDetection(vec1, vec2, dist=35) {
     // Checks if two objects or vectors collide
@@ -230,9 +304,9 @@ function moveParabolic(object, ax, ay, height, t, speed) {
 
 // Rotates Object
 function rotateObject(object, rad) {
-    object.rotation.y += Math.random() * (0.03 - 0.01) + 0.01
-    object.rotation.z += Math.random() * (0.03 - 0.01) + 0.01
-    object.rotation.x += Math.random() * (0.03 - 0.01) + 0.01
+    object.rotation.y +=  (0.03 - 0.01) + 0.01
+    object.rotation.z +=  (0.03 - 0.01) + 0.01
+    object.rotation.x +=  (0.03 - 0.01) + 0.01
 
     if (object.rotation.x > 2 * Math.PI) object.rotation.x = 0
     if (object.rotation.y > 2 * Math.PI) object.rotation.y = 0
