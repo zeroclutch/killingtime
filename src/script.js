@@ -3,7 +3,7 @@ const mpHands = window;
 const drawingUtils = window;
 const controls = window;
 const controls3d = window;
-const meterToPixels = 3779.5275590551;
+const sensitivity = 0.25;
 // Usage: testSupport({client?: string, os?: string}[])
 // Client and os are regular expressions.
 // See: https://cdn.jsdelivr.net/npm/device-detector-js@2.2.10/README.md for
@@ -65,6 +65,11 @@ const grid = new controls3d.LandmarkGrid(landmarkContainer, {
     centered: false,
 });
 
+
+let cache = new Array(7)
+let cacheMaxElements = 0
+let i = 0
+
 function onResults(results) {
     // Hide the spinner.
     document.body.classList.add('loaded');
@@ -91,22 +96,35 @@ function onResults(results) {
         }
     }
 
+    // If a hand is on screen, calculate the cursor
     if (results.multiHandLandmarks && results.multiHandLandmarks.length > 0) {
-        console.log(normalizeHand(results.multiHandLandmarks[0][8], results.multiHandLandmarks[0][5], meterToPixels));
-        let dispx = normalizeHand(results.multiHandLandmarks[0][8], results.multiHandLandmarks[0][5], meterToPixels)[0];
-        let dispy = normalizeHand(results.multiHandLandmarks[0][8], results.multiHandLandmarks[0][5], meterToPixels)[1];
-        const lm = [{'x': dispx,'y': dispy, 'z': 0}];
-        //const lm1 =  [{'x': 0.6,'y': 0.6, 'z': -0.15}];
+        cache[i] = normalizeHand(results.multiHandLandmarks[0][8], results.multiHandLandmarks[0][5], sensitivity)
+        console.log(cache);
+
+        // Average out the cache values
+        let avgX = 0, avgY = 0
+
+        for(let j = 0; j < cacheMaxElements; j++) {
+            if ( !cache[j]) break
+            avgX += cache[j][0]
+            avgY += cache[j][1]
+        }
+
+        i++
+        cacheMaxElements = Math.max(cacheMaxElements, i + 1) // Stores the highest recorded number of elements in cache
+        console.log(cacheMaxElements)
+        avgX /= cacheMaxElements
+        avgY /= cacheMaxElements
+
+        // Reset if we're at the end
+        if(i === cache.length - 1) i = 0
+
+        const lm = [{'x': avgX,'y': avgY, 'z': 0}];
         drawingUtils.drawLandmarks(canvasCtx, lm, {
             color: '#00FF00',
             fillColor: '#FF00FF',
             radius: 10
         });
-        // drawingUtils.drawLandmarks(canvasCtx, lm1, {
-        //     color: '#00FF00',
-        //     fillColor: '#0000FF',
-        //     radius: 10
-        // });
     }
 
     canvasCtx.restore();
@@ -136,13 +154,14 @@ function onResults(results) {
 const hands = new mpHands.Hands(config);
 hands.onResults(onResults);
 
+// Find position on screen given hand coordinates
 function normalizeHand(p1, p2, d) {
-    let x = p1['x'] - p2['x'];
-    let y = p1['y'] - p2['y'];
-    let z = p1['z'] - p2['z'];
-    let yPos = p2['y'] - y*(0.3)/z;//(z / x) * d;
-    let xPos = p2['x'] - x*(0.3)/z;
-    return [xPos, yPos];
+    let x = p1.x - p2.x
+    let y = p1.y - p2.y
+    let z = p1.z - p2.z
+    let yPos = 0.5 - y * d / z
+    let xPos = 0.5 - x * d / z
+    return [xPos, yPos]
   }
 
 // Present a control panel through which the user can manipulate the solution
