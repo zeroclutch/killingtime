@@ -75,6 +75,8 @@ function onResults(results) {
     document.body.classList.add('loaded');
     // Update the frame rate.
     fpsControl.tick();
+    fpsControl.tick();
+    fpsControl.tick();
     // Draw the overlays.
     canvasCtx.save();
     canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
@@ -98,8 +100,7 @@ function onResults(results) {
 
     // If a hand is on screen, calculate the cursor
     if (results.multiHandLandmarks && results.multiHandLandmarks.length > 0) {
-        cache[i] = normalizeHand(results.multiHandLandmarks[0][8], results.multiHandLandmarks[0][5], sensitivity)
-        console.log(cache);
+        cache[i] = normalizeHand(results.multiHandLandmarks[0][8], results.multiHandLandmarks[0][1], sensitivity)
 
         // Average out the cache values
         let avgX = 0, avgY = 0
@@ -111,22 +112,23 @@ function onResults(results) {
         }
 
         i++
+
         cacheMaxElements = Math.max(cacheMaxElements, i + 1) // Stores the highest recorded number of elements in cache
-        console.log(cacheMaxElements)
         avgX /= cacheMaxElements
         avgY /= cacheMaxElements
 
         // Reset if we're at the end
         if(i === cache.length - 1) i = 0
 
+        let isTriggered = triggered(results.multiHandLandmarks[0][5], results.multiHandLandmarks[0][4])
+
         const lm = [{'x': avgX,'y': avgY, 'z': 0}];
         drawingUtils.drawLandmarks(canvasCtx, lm, {
             color: '#00FF00',
-            fillColor: '#FF00FF',
+            fillColor: isTriggered ? '#0000FF' : '#FF00FF',
             radius: 10
         });
     }
-
     canvasCtx.restore();
     if (results.multiHandWorldLandmarks) {
         // We only get to call updateLandmarks once, so we need to cook the data to
@@ -159,10 +161,21 @@ function normalizeHand(p1, p2, d) {
     let x = p1.x - p2.x
     let y = p1.y - p2.y
     let z = p1.z - p2.z
-    let yPos = 0.5 - y * d / z
-    let xPos = 0.5 - x * d / z
+    let yPos = p2.y - y * d / z
+    let xPos = p2.x - x * d / z
     return [xPos, yPos]
-  }
+}
+
+function inRange(a, b, range){
+    return (a < b + range && a > b - range)
+}
+
+function triggered(f2, t1) {
+    let range = Math.abs(1.6*f2.z)
+    console.log(range)
+    // TODO: Do something special when pointing straight
+    return ( inRange(t1.y, f2.y, range) && inRange(t1.x, f2.x, range) && inRange(t1.z, f2.z, range))
+}
 
 // Present a control panel through which the user can manipulate the solution
 // options.
