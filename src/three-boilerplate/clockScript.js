@@ -11,6 +11,7 @@ let scene = new THREE.Scene();
 scene.background = new THREE.Color( 0x444444 )
 
 let camera = new THREE.PerspectiveCamera( 75, window.innerWidth/window.innerHeight, 0.1, 10000 );
+camera.position.y = 200
 camera.position.z = 200;
 
 let renderer = new THREE.WebGLRenderer();
@@ -110,7 +111,7 @@ async function spawn(duration) {
     spawn(300)
     let animate = function () {
         requestAnimationFrame( animate );
-        if(Math.random() < 0.001) spawn(1000)
+        if(Math.random() < 0.01) spawn(1000)
         frame++
 
         controls.update();
@@ -123,7 +124,7 @@ async function spawn(duration) {
                 i--
                 continue
             }
-            moveParabolic(object.object, -0.5, -1, (frame - object.createdAt - 100) * 0.5)
+            moveParabolic(object.object, -0.5, -0.5, (frame - object.createdAt - 100) * 0.5)
             rotateObject(object.object)
         }
 
@@ -150,3 +151,39 @@ function rotateObject(object, rad) {
     if (object.rotation.y > 2 * Math.PI) object.rotation.y = 0
     if (object.rotation.z > 2 * Math.PI) object.rotation.z = 0
 }
+
+
+// edmund's workspace
+const raycaster = new THREE.Raycaster();
+const pointer = new THREE.Vector2();
+
+function onPointerMove( event ) {
+
+	// calculate pointer position in normalized device coordinates
+	// (-1 to +1) for both components
+
+	pointer.x = ( event.clientX / window.innerWidth ) * 2 - 1;
+	pointer.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
+
+}
+
+function render() {
+
+	// update the picking ray with the camera and pointer position
+	raycaster.setFromCamera( pointer, camera );
+
+	// calculate objects intersecting the picking ray
+	const intersects = raycaster.intersectObjects( scene.children );
+
+	for ( let i = 0; i < intersects.length; i ++ ) {
+
+		intersects[ i ].object.material.color.set( 0xff0000 );
+
+	}
+
+	renderer.render( scene, camera );
+}
+
+window.addEventListener( 'pointermove', onPointerMove );
+
+window.requestAnimationFrame(render);
