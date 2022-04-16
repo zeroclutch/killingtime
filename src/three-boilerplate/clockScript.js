@@ -126,7 +126,7 @@ function addObject(object, killAfter) {
         for(let i in spawnedObjects) {
             let object = spawnedObjects[i]
             let objectPos = object.object.position
-            console.log(collisionDetection(pos, objectPos))
+            console.log(collisionDetection(cursorPos, objectPos))
             if(frame === object.killAt ) {
                 scene.remove(object.object)
                 spawnedObjects.splice(i, 1)
@@ -186,7 +186,7 @@ function rotateObject(object, rad) {
 const raycaster = new THREE.Raycaster();
 const pointer = new THREE.Vector3();
 var vec = new THREE.Vector3(); // create once and reuse
-var pos = new THREE.Vector3(); // create once and reuse
+var cursorPos = new THREE.Vector3(); // create once and reuse
 
 function onPointerMove( event ) {
 
@@ -195,6 +195,9 @@ function onPointerMove( event ) {
 
 	pointer.x = ( event.clientX / window.innerWidth ) * 2 - 1;
 	pointer.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
+
+
+    // Different approach from raycasting
 
     vec.set(
         ( event.clientX / window.innerWidth ) * 2 - 1,
@@ -207,17 +210,7 @@ function onPointerMove( event ) {
 
     var distance = - camera.position.z / vec.z;
 
-    pos.copy( camera.position ).add( vec.multiplyScalar( distance ) );
-
-    // console.log(pos.x, pos.y, pos.z)
-
-    // const geometry = new THREE.CircleGeometry( 5, 32 );
-    // const material = new THREE.MeshBasicMaterial( { color: (isHitting) ? 0xffffff : 0xffff00 } );
-    // const circle = new THREE.Mesh( geometry, material );
-    // circle.position.x = pos.x
-    // circle.position.y = pos.y
-    // circle.position.z = pos.z
-    // scene.add( circle );
+    cursorPos.copy( camera.position ).add( vec.multiplyScalar( distance ) );
 }
 
 function render() {
