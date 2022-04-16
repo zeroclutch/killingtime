@@ -100,7 +100,7 @@ function onResults(results) {
 
     // If a hand is on screen, calculate the cursor
     if (results.multiHandLandmarks && results.multiHandLandmarks.length > 0) {
-        cache[i] = normalizeHand(results.multiHandLandmarks[0][8], results.multiHandLandmarks[0][5], sensitivity)
+        cache[i] = normalizeHand(results.multiHandLandmarks[0][8], results.multiHandLandmarks[0][1], sensitivity)
 
         // Average out the cache values
         let avgX = 0, avgY = 0
@@ -120,7 +120,7 @@ function onResults(results) {
         // Reset if we're at the end
         if(i === cache.length - 1) i = 0
 
-        let isTriggered = triggered(results.multiHandLandmarks[0][8], results.multiHandLandmarks[0][0], results.multiHandLandmarks[0][4], results.multiHandLandmarks[0][3])
+        let isTriggered = triggered(results.multiHandLandmarks[0][5], results.multiHandLandmarks[0][4])
 
         const lm = [{'x': avgX,'y': avgY, 'z': 0}];
         drawingUtils.drawLandmarks(canvasCtx, lm, {
@@ -170,10 +170,10 @@ function inRange(a, b, range){
     return (a < b + range && a > b - range)
 }
 
-function triggered(f1, f2, t1, t2) {
-    let range = Math.abs(2*f2.z)
+function triggered(f2, t1) {
+    let range = Math.abs(1.6*f2.z)
     console.log(range)
-
+    // TODO: Do something special when pointing straight
     return ( inRange(t1.y, f2.y, range) && inRange(t1.x, f2.x, range) && inRange(t1.z, f2.z, range))
 }
 
