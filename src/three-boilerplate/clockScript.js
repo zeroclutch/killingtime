@@ -118,10 +118,6 @@ function addObject(object, killAfter) {
     // Animation loop
     let animate = function () {
         requestAnimationFrame( animate );
-<<<<<<< HEAD
-=======
-        if(Math.random() < 0.01) spawn(1000)
->>>>>>> 101821862e23744f515644624fc7b92574f71b7f
         frame++
 
         controls.update();
