@@ -8,10 +8,9 @@ let frame = 0
 
 // Initialize scene and renderer
 let scene = new THREE.Scene();
-scene.background = new THREE.Color( 0x444444 )
+scene.background = new THREE.Color( 0xe3eeff )
 
 let camera = new THREE.PerspectiveCamera( 75, window.innerWidth/window.innerHeight, 0.1, 10000 );
-camera.position.y = 200
 camera.position.z = 200;
 
 let renderer = new THREE.WebGLRenderer();
@@ -33,7 +32,7 @@ fillLight.position.set(100, 0, 100);
 let backLight = new THREE.DirectionalLight(0xffffff, 1.0);
 backLight.position.set(100, 0, -100).normalize();
 
-const light = new THREE.AmbientLight( 0x404040, 20 ); // soft white light
+const light = new THREE.AmbientLight( 0x404040, 15 ); // soft white light
 
 // Add lighting
 scene.add( light );
@@ -73,8 +72,8 @@ const loadObj = (objPath, mtlPath) => {
 
 // All possible spawnable clocks
 const OBJECTS = [
-    { obj: 'clock2/watch_benzino_1.obj', mtl: 'clock2/watch_benzino_1.mtl', scaleX: 50, scaleY: 50, scaleZ: 50, },
-    { obj: '/clock3/Clock_obj.obj', mtl: '/clock3/Clock_obj.mtl', scaleX: 150, scaleY: 150, scaleZ: 150,},
+    { obj: 'blueclock/LP_Classic_Wecker.obj', mtl: 'blueclock/LP_Classic_Wecker.mtl', scaleX: 200, scaleY: 200, scaleZ: 200, },
+    // { obj: '/clock3/Clock_obj.obj', mtl: '/clock3/Clock_obj.mtl', scaleX: 150, scaleY: 150, scaleZ: 150,},
 ]
 
 // Current list of clocks
@@ -99,7 +98,7 @@ async function createObject(options) {
 }
 
 function addObject(object, killAfter) {
-    object.killAt = frame + killAfter
+    object.killAt = frame + (killAfter || 0)
     object.createdAt = frame
     scene.add(object.object);
     spawnedObjects.push(object)
@@ -113,7 +112,7 @@ function addObject(object, killAfter) {
         createdObjects.push(await createObject({ killAfter: 100 }))
     }
 
-    addObject(createdObjects[0])
+    addObject(createdObjects[0], 200)
 
     // Animation loop
     let animate = function () {
@@ -134,7 +133,9 @@ function addObject(object, killAfter) {
                 i--
                 continue
             }
-            moveParabolic(object.object, -0.5, -0.5, (frame - object.createdAt - 100) * 0.5)
+
+            const SPEED = 0.4
+            moveParabolic(object.object, -0.5, -0.5, 100, (frame - object.createdAt - 100),  SPEED)
             rotateObject(object.object)
         }
     };
@@ -142,8 +143,9 @@ function addObject(object, killAfter) {
 })()
 
 // Move parabolically as a function of time
-function moveParabolic(object, ax, ay, t) {
-    let x = 2 * ax * t, y = ay * t ** 2
+function moveParabolic(object, ax, ay, height, t, speed) {
+    t *= speed
+    let x = 2 * ax * t, y = ay * t ** 2 + height
     object.position.x = x
     object.position.y = y
 }
