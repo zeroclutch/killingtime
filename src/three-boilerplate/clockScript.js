@@ -8,7 +8,7 @@ let frame = 0
 
 // Initialize scene and renderer
 let scene = new THREE.Scene();
-scene.background = new THREE.Color( 0x444444 )
+scene.background = new THREE.Color( 0xe3eeff )
 
 let camera = new THREE.PerspectiveCamera( 75, window.innerWidth/window.innerHeight, 0.1, 10000 );
 camera.position.z = 200;
@@ -32,7 +32,7 @@ fillLight.position.set(100, 0, 100);
 let backLight = new THREE.DirectionalLight(0xffffff, 1.0);
 backLight.position.set(100, 0, -100).normalize();
 
-const light = new THREE.AmbientLight( 0x404040 ); // soft white light
+const light = new THREE.AmbientLight( 0x404040, 15 ); // soft white light
 
 // Add lighting
 scene.add( light );
@@ -54,7 +54,6 @@ const loadObj = (objPath, mtlPath) => {
             mtlLoader.load(mtlPath, function(materials) {
                 objLoader.setMaterials(materials);
                 objLoader.load(objPath, function (object) {
-                    scene.add(object);
                     resolve(object)
                 });
             })
@@ -62,7 +61,6 @@ const loadObj = (objPath, mtlPath) => {
 
         
         objLoader.load(objPath, function (object) {
-            scene.add(object);
             resolve(object)
         });
     })
@@ -74,22 +72,25 @@ const loadObj = (objPath, mtlPath) => {
 
 // All possible spawnable clocks
 const OBJECTS = [
-    //{ obj: 'clock2/watch_benzino_1.obj', mtl: 'clock2/watch_benzino_1.mtl', scaleX: 200, scaleY: 200, scaleZ: 200, },
-    { obj: '/clock3/Clock_obj.obj', /*mtl: '/clock3/Clock_obj.mtl',*/ scaleX: 150, scaleY: 150, scaleZ: 150,},
+    { obj: 'blueclock/LP_Classic_Wecker.obj', mtl: 'blueclock/LP_Classic_Wecker.mtl', scaleX: 200, scaleY: 200, scaleZ: 200, },
+    // { obj: '/clock3/Clock_obj.obj', mtl: '/clock3/Clock_obj.mtl', scaleX: 150, scaleY: 150, scaleZ: 150,},
+]
+
+const CLOCK_TYPES = [
+    { TYPE: 0, shininess: 50, specular: new THREE.Color(0x292929), color: new THREE.Color( 0xFF0000 ) }
 ]
 
 // Current list of clocks
 const spawnedObjects = []
+const createdObjects = []
 
 // Spawns a new clock
-async function spawn(duration) {
+async function createObject(options) {
     // Select random object from possible list
     let data = OBJECTS[Math.floor(Math.random() * OBJECTS.length)]
     // Load object into scene
     let object = await loadObj(data.obj, data.mtl)
 
-    object.position.z = -300
-    
     // Scale object
     object.scale.x = data.scaleX
     object.scale.y = data.scaleY
@@ -97,45 +98,83 @@ async function spawn(duration) {
 
     // Add some metadata about the object
     let createdAt = frame
-    let killAt = frame + duration
-    spawnedObjects.push({ object, createdAt, killAt })
+    let killAt = frame + (options.killAfter || -1) 
+    return { object, createdAt, killAt }
+}
+
+function addObject(object, killAfter) {
+    object.killAt = frame + (killAfter || 0)
+    object.createdAt = frame
+    scene.add(object.object);
+    spawnedObjects.push(object)
     console.log(spawnedObjects)
 }
 
+// Load objects
+async function initializeClocks(clocksPerType) {
+    for(let i = 0; i < CLOCK_TYPES.length; i++) {
+        for(let j = 0; j < clocksPerType; j++) {
+            let clock = await createObject({ killAfter: 100 })
+            createdObjects.push(clock)
+
+            let type = CLOCK_TYPES[i]
+
+            // Add specific type properties
+            clock.type = type.TYPE
+            const mesh = clock.object.children[0]
+            const phongMaterial = mesh.material[1]
+
+            Object.assign(phongMaterial, type)
+
+            console.log(createdObjects, phongMaterial)
+        }
+    }
+}
+
+function addClock(type, duration=200) {
+    // Try to find an available clock to add
+    let clock = createdObjects.find(obj => !obj.object.parent && obj.type === type)
+    if(!clock) return false
+    addObject(clock, duration)
+    return true
+}
+
 ;(async function() {
-    // Load objects
-    // let r2d2 = await loadObj('r2-d2.obj');
+    // Create all possible clocks and cache them
+    await initializeClocks(1)
+    // Add a clock of type 0 for 200 frames. If there are no clocks available, this returns false
+    console.log(addClock(0, 200))
+
     // Animation loop
-    let t = -100
-    spawn(300)
     let animate = function () {
         requestAnimationFrame( animate );
-        if(Math.random() < 0.001) spawn(1000)
         frame++
 
         controls.update();
         renderer.render(scene, camera);
         
+        // Spawns an moves
         for(let i in spawnedObjects) {
             let object = spawnedObjects[i]
-            if(frame >= object.killAt) {
+            if(frame === object.killAt ) {
+                scene.remove(object.object)
                 spawnedObjects.splice(i, 1)
                 i--
                 continue
             }
-            moveParabolic(object.object, -0.5, -1, (frame - object.createdAt - 100) * 0.5)
+
+            const SPEED = 0.4
+            moveParabolic(object.object, -0.5, -0.5, 100, (frame - object.createdAt - 100),  SPEED)
             rotateObject(object.object)
         }
-
-        t += 0.5
-        if(t > 100) t = -100;
     };
     animate();
 })()
 
 // Move parabolically as a function of time
-function moveParabolic(object, ax, ay, t) {
-    let x = 2 * ax * t, y = ay * t ** 2
+function moveParabolic(object, ax, ay, height, t, speed) {
+    t *= speed
+    let x = 2 * ax * t, y = ay * t ** 2 + height
     object.position.x = x
     object.position.y = y
 }
@@ -150,3 +189,39 @@ function rotateObject(object, rad) {
     if (object.rotation.y > 2 * Math.PI) object.rotation.y = 0
     if (object.rotation.z > 2 * Math.PI) object.rotation.z = 0
 }
+
+
+// edmund's workspace
+const raycaster = new THREE.Raycaster();
+const pointer = new THREE.Vector2();
+
+function onPointerMove( event ) {
+
+	// calculate pointer position in normalized device coordinates
+	// (-1 to +1) for both components
+
+	pointer.x = ( event.clientX / window.innerWidth ) * 2 - 1;
+	pointer.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
+
+}
+
+function render() {
+
+	// update the picking ray with the camera and pointer position
+	raycaster.setFromCamera( pointer, camera );
+
+	// calculate objects intersecting the picking ray
+	const intersects = raycaster.intersectObjects( scene.children );
+
+	for ( let i = 0; i < intersects.length; i ++ ) {
+
+		intersects[ i ].object.material.color.set( 0xff0000 );
+
+	}
+
+	renderer.render( scene, camera );
+}
+
+window.addEventListener( 'pointermove', onPointerMove );
+
+window.requestAnimationFrame(render);
