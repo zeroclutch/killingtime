@@ -66,7 +66,7 @@ const grid = new controls3d.LandmarkGrid(landmarkContainer, {
 });
 
 
-let cache = new Array(7)
+let cache = new Array(10)
 let cacheMaxElements = 0
 let i = 0
 let isReady = true
@@ -75,7 +75,6 @@ function onResults(results) {
     // Hide the spinner.
     document.body.classList.add('loaded');
     // Update the frame rate.
-    fpsControl.tick();
     fpsControl.tick();
 
     // Draw the overlays.
@@ -101,7 +100,7 @@ function onResults(results) {
 
     // If a hand is on screen, calculate the cursor
     if (results.multiHandLandmarks && results.multiHandLandmarks.length > 0) {
-        cache[i] = normalizeHand(results.multiHandLandmarks[0][8], results.multiHandLandmarks[0][1], sensitivity)
+        cache[i] = normalizeHand(results.multiHandLandmarks[0][8], results.multiHandLandmarks[0][5], sensitivity)
 
         // Average out the cache values
         let avgX = 0, avgY = 0
@@ -121,13 +120,13 @@ function onResults(results) {
         // Reset if we're at the end
         if(i === cache.length - 1) i = 0
 
-        let isTriggered = triggered(results.multiHandLandmarks[0][5], results.multiHandLandmarks[0][4])
+        let isTriggered = triggered(results.multiHandLandmarks[0][6], results.multiHandLandmarks[0][5], results.multiHandLandmarks[0][4])
 
         const lm = [{'x': avgX,'y': avgY, 'z': 0}];
         drawingUtils.drawLandmarks(canvasCtx, lm, {
             color: '#00FF00',
-            fillColor: isTriggered && isReady ? '#0000FF' : '#FF00FF',
-            radius: isTriggered && isReady ? 50 : 10 
+            fillColor: isTriggered && isReady ? '#0000FF' : '#FF00FF',//
+            radius: isTriggered && isReady ? 50 : 10 // 
         })
         isReady = !isTriggered
     }
@@ -157,6 +156,7 @@ function onResults(results) {
 }
 const hands = new mpHands.Hands(config);
 hands.onResults(onResults);
+hands.onResults(onResults);
 
 // Find position on screen given hand coordinates
 function normalizeHand(p1, p2, d) {
@@ -172,15 +172,16 @@ function inRange(a, b, range){
     return (a < b + range && a > b - range)
 }
 
-function triggered(f2, t1) {
+function triggered(f1, f2, t1) {
     let range = (Math.abs(f2.z)**(1/2))/2
     
     // TODO: Do something special when pointing straight
-    let d = ((t1.x - f2.x) ** 2 + (t1.y - f2.y) ** 2 + (t1.z- f2.z) ** 2) ** (1/2)
-    console.log(d, range)
+    let d1 = ((t1.x - f1.x) ** 2 + (t1.y - f1.y) ** 2 + (t1.z- f1.z) ** 2) ** (1/2)
+    let d2 = ((t1.x - f2.x) ** 2 + (t1.y - f2.y) ** 2 + (t1.z- f2.z) ** 2) ** (1/2)
+    console.log(d1, d2, range)
 
     // Return true if distance is close enough to 0
-    return inRange(d, 0, range)//inRange(t1.y, f2.y, range) && inRange(t1.x, f2.x, range) && inRange(t1.z, f2.z, range/2))
+    return inRange(d2, 0, range) || inRange(d1, 0, range)//inRange(t1.y, f2.y, range) && inRange(t1.x, f2.x, range) && inRange(t1.z, f2.z, range/2))
 }
 
 // Present a control panel through which the user can manipulate the solution
