@@ -126,8 +126,8 @@ function onResults(results) {
         const lm = [{'x': avgX,'y': avgY, 'z': 0}];
         drawingUtils.drawLandmarks(canvasCtx, lm, {
             color: '#00FF00',
-            fillColor: isTriggered && isReady ? '#0000FF' : '#FF00FF',
-            radius: isTriggered && isReady ? 50 : 10 
+            fillColor: isTriggered ? '#0000FF' : '#FF00FF', // && isReady 
+            radius: 10 //isTriggered && isReady ? 50 : 
         })
         isReady = !isTriggered
     }
