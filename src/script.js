@@ -173,8 +173,7 @@ function triggered(f1, f2, t1, t2) {
     let range = Math.abs(2*f2.z)
     console.log(range)
 
-    if ( inRange(t1.y, f2.y, range) && inRange(t1.x, f2.x, range) && inRange(t1.z, f2.z, range)) return true
-    return false
+    return ( inRange(t1.y, f2.y, range) && inRange(t1.x, f2.x, range) && inRange(t1.z, f2.z, range))
 }
 
 // Present a control panel through which the user can manipulate the solution
