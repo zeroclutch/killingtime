@@ -156,6 +156,8 @@ function addClock(type, duration=200) {
         // Spawns an moves
         for(let i in spawnedObjects) {
             let object = spawnedObjects[i]
+            let objectPos = object.object.position
+            console.log(collisionDetection(cursorPos, objectPos))
             if(frame === object.killAt ) {
                 scene.remove(object.object)
                 spawnedObjects.splice(i, 1)
@@ -170,6 +172,26 @@ function addClock(type, duration=200) {
     };
     animate();
 })()
+
+function collisionDetection(vec1, vec2, dist=35) {
+    // Checks if two objects or vectors collide
+    // Takes two position vectors (accessible through a spawned object's object.object.pos)
+    if(!vec1.x || !vec2.x) return false; // Check that both vectors are valid
+
+
+    let xDiff = Math.abs(vec1.x - vec2.x)
+    let yDiff = Math.abs(vec1.y - vec2.y)
+
+    let euclidDist = Math.sqrt(Math.pow(xDiff, 2) + Math.pow(yDiff, 2))
+
+    // TODO: if necessary: determine if z's collide
+    // TODO: decide if euclidean Dist or just simple xDiff and yDiff is better/easier
+
+    // return xDiff < dist && yDiff < dist
+    return euclidDist < dist
+}
+
+
 
 // Move parabolically as a function of time
 function moveParabolic(object, ax, ay, height, t, speed) {
@@ -193,7 +215,9 @@ function rotateObject(object, rad) {
 
 // edmund's workspace
 const raycaster = new THREE.Raycaster();
-const pointer = new THREE.Vector2();
+const pointer = new THREE.Vector3();
+var vec = new THREE.Vector3(); // create once and reuse
+var cursorPos = new THREE.Vector3(); // create once and reuse
 
 function onPointerMove( event ) {
 
@@ -203,6 +227,21 @@ function onPointerMove( event ) {
 	pointer.x = ( event.clientX / window.innerWidth ) * 2 - 1;
 	pointer.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
 
+
+    // Different approach from raycasting
+
+    vec.set(
+        ( event.clientX / window.innerWidth ) * 2 - 1,
+        - ( event.clientY / window.innerHeight ) * 2 + 1,
+        0.5 );
+
+    vec.unproject( camera );
+
+    vec.sub( camera.position ).normalize();
+
+    var distance = - camera.position.z / vec.z;
+
+    cursorPos.copy( camera.position ).add( vec.multiplyScalar( distance ) );
 }
 
 function render() {
@@ -222,6 +261,6 @@ function render() {
 	renderer.render( scene, camera );
 }
 
-window.addEventListener( 'pointermove', onPointerMove );
+window.addEventListener( 'mousemove', onPointerMove );
 
 window.requestAnimationFrame(render);
