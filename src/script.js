@@ -69,6 +69,7 @@ const grid = new controls3d.LandmarkGrid(landmarkContainer, {
 let cache = new Array(7)
 let cacheMaxElements = 0
 let i = 0
+let isReady = true
 
 function onResults(results) {
     // Hide the spinner.
@@ -76,7 +77,7 @@ function onResults(results) {
     // Update the frame rate.
     fpsControl.tick();
     fpsControl.tick();
-    fpsControl.tick();
+
     // Draw the overlays.
     canvasCtx.save();
     canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
@@ -125,9 +126,10 @@ function onResults(results) {
         const lm = [{'x': avgX,'y': avgY, 'z': 0}];
         drawingUtils.drawLandmarks(canvasCtx, lm, {
             color: '#00FF00',
-            fillColor: isTriggered ? '#0000FF' : '#FF00FF',
-            radius: 10
-        });
+            fillColor: isTriggered ? '#0000FF' : '#FF00FF', // && isReady 
+            radius: 10 //isTriggered && isReady ? 50 : 
+        })
+        isReady = !isTriggered
     }
     canvasCtx.restore();
     if (results.multiHandWorldLandmarks) {
@@ -171,10 +173,14 @@ function inRange(a, b, range){
 }
 
 function triggered(f2, t1) {
-    let range = Math.abs(1.6*f2.z)
-    console.log(range)
+    let range = (Math.abs(f2.z)**(1/2))/2
+    
     // TODO: Do something special when pointing straight
-    return ( inRange(t1.y, f2.y, range) && inRange(t1.x, f2.x, range) && inRange(t1.z, f2.z, range))
+    let d = ((t1.x - f2.x) ** 2 + (t1.y - f2.y) ** 2 + (t1.z- f2.z) ** 2) ** (1/2)
+    console.log(d, range)
+
+    // Return true if distance is close enough to 0
+    return inRange(d, 0, range)//inRange(t1.y, f2.y, range) && inRange(t1.x, f2.x, range) && inRange(t1.z, f2.z, range/2))
 }
 
 // Present a control panel through which the user can manipulate the solution
