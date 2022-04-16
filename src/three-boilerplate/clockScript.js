@@ -76,8 +76,13 @@ const OBJECTS = [
     // { obj: '/clock3/Clock_obj.obj', mtl: '/clock3/Clock_obj.mtl', scaleX: 150, scaleY: 150, scaleZ: 150,},
 ]
 
+const CLOCK_TYPES = [
+    { TYPE: 0, shininess: 50, specular: new THREE.Color(0x292929), color: new THREE.Color( 0xFF0000 ) }
+]
+
 // Current list of clocks
 const spawnedObjects = []
+const createdObjects = []
 
 // Spawns a new clock
 async function createObject(options) {
@@ -102,17 +107,43 @@ function addObject(object, killAfter) {
     object.createdAt = frame
     scene.add(object.object);
     spawnedObjects.push(object)
+    console.log(spawnedObjects)
+}
+
+// Load objects
+async function initializeClocks(clocksPerType) {
+    for(let i = 0; i < CLOCK_TYPES.length; i++) {
+        for(let j = 0; j < clocksPerType; j++) {
+            let clock = await createObject({ killAfter: 100 })
+            createdObjects.push(clock)
+
+            let type = CLOCK_TYPES[i]
+
+            // Add specific type properties
+            clock.type = type.TYPE
+            const mesh = clock.object.children[0]
+            const phongMaterial = mesh.material[1]
+
+            Object.assign(phongMaterial, type)
+
+            console.log(createdObjects, phongMaterial)
+        }
+    }
+}
+
+function addClock(type, duration=200) {
+    // Try to find an available clock to add
+    let clock = createdObjects.find(obj => !obj.object.parent && obj.type === type)
+    if(!clock) return false
+    addObject(clock, duration)
+    return true
 }
 
 ;(async function() {
-    // Load objects
-    const OBJECT_COUNT = 5
-    const createdObjects = []
-    for(let i = 0; i < OBJECT_COUNT; i++) {
-        createdObjects.push(await createObject({ killAfter: 100 }))
-    }
-
-    addObject(createdObjects[0], 200)
+    // Create all possible clocks and cache them
+    await initializeClocks(1)
+    // Add a clock of type 0 for 200 frames. If there are no clocks available, this returns false
+    console.log(addClock(0, 200))
 
     // Animation loop
     let animate = function () {
@@ -121,8 +152,6 @@ function addObject(object, killAfter) {
 
         controls.update();
         renderer.render(scene, camera);
-
-        console.log(spawnedObjects)
         
         // Spawns an moves
         for(let i in spawnedObjects) {
