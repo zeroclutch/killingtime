@@ -79,6 +79,7 @@ function onResults(results) {
             const classification = results.multiHandedness[index];
             const isRightHand = classification.label === 'Right';
             const landmarks = results.multiHandLandmarks[index];
+            console.log(results.multiHandLandmarks[index])
             drawingUtils.drawConnectors(canvasCtx, landmarks, mpHands.HAND_CONNECTIONS, { color: isRightHand ? '#00FF00' : '#FF0000' });
             drawingUtils.drawLandmarks(canvasCtx, landmarks, {
                 color: isRightHand ? '#00FF00' : '#FF0000',
@@ -89,6 +90,25 @@ function onResults(results) {
             });
         }
     }
+
+    if (results.multiHandLandmarks && results.multiHandLandmarks.length > 0) {
+        console.log(normalizeHand(results.multiHandLandmarks[0][8], results.multiHandLandmarks[0][5], meterToPixels));
+        let dispx = normalizeHand(results.multiHandLandmarks[0][8], results.multiHandLandmarks[0][5], meterToPixels)[0];
+        let dispy = normalizeHand(results.multiHandLandmarks[0][8], results.multiHandLandmarks[0][5], meterToPixels)[1];
+        const lm = [{'x': dispx,'y': dispy, 'z': 0}];
+        //const lm1 =  [{'x': 0.6,'y': 0.6, 'z': -0.15}];
+        drawingUtils.drawLandmarks(canvasCtx, lm, {
+            color: '#00FF00',
+            fillColor: '#FF00FF',
+            radius: 10
+        });
+        // drawingUtils.drawLandmarks(canvasCtx, lm1, {
+        //     color: '#00FF00',
+        //     fillColor: '#0000FF',
+        //     radius: 10
+        // });
+    }
+
     canvasCtx.restore();
     if (results.multiHandWorldLandmarks) {
         // We only get to call updateLandmarks once, so we need to cook the data to
@@ -111,8 +131,7 @@ function onResults(results) {
     else {
         grid.updateLandmarks([]);
     }
-    if (results.multiHandLandmarks && results.multiHandLandmarks.length > 0) 
-        console.log(normalizeHand(results.multiHandLandmarks[0][8], results.multiHandLandmarks[0][5], meterToPixels));
+   
 }
 const hands = new mpHands.Hands(config);
 hands.onResults(onResults);
@@ -121,8 +140,8 @@ function normalizeHand(p1, p2, d) {
     let x = p1['x'] - p2['x'];
     let y = p1['y'] - p2['y'];
     let z = p1['z'] - p2['z'];
-    let xPos = (z / x) * d;
-    let yPos = (y / x) * d;
+    let yPos = p2['y'] - y*(60)*z;//(z / x) * d;
+    let xPos = p2['x'] - x*(60)*z;
     return [xPos, yPos];
   }
 
@@ -131,7 +150,7 @@ function normalizeHand(p1, p2, d) {
 new controls
     .ControlPanel(controlsElement, {
     selfieMode: true,
-    maxNumHands: 2,
+    maxNumHands: 1,
     modelComplexity: 1,
     minDetectionConfidence: 0.5,
     minTrackingConfidence: 0.5
