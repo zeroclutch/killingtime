@@ -99,7 +99,6 @@ function onResults(results) {
     // If a hand is on screen, calculate the cursor
     if (results.multiHandLandmarks && results.multiHandLandmarks.length > 0) {
         cache[i] = normalizeHand(results.multiHandLandmarks[0][8], results.multiHandLandmarks[0][5], sensitivity)
-        console.log(cache);
 
         // Average out the cache values
         let avgX = 0, avgY = 0
@@ -111,18 +110,20 @@ function onResults(results) {
         }
 
         i++
+
         cacheMaxElements = Math.max(cacheMaxElements, i + 1) // Stores the highest recorded number of elements in cache
-        console.log(cacheMaxElements)
         avgX /= cacheMaxElements
         avgY /= cacheMaxElements
 
         // Reset if we're at the end
         if(i === cache.length - 1) i = 0
 
+        let isTriggered = triggered(results.multiHandLandmarks[0][8], results.multiHandLandmarks[0][5], results.multiHandLandmarks[0][4], results.multiHandLandmarks[0][3])
+
         const lm = [{'x': avgX,'y': avgY, 'z': 0}];
         drawingUtils.drawLandmarks(canvasCtx, lm, {
             color: '#00FF00',
-            fillColor: '#FF00FF',
+            fillColor: isTriggered ? '#0000FF' : '#FF00FF',
             radius: 10
         });
     }
@@ -159,10 +160,22 @@ function normalizeHand(p1, p2, d) {
     let x = p1.x - p2.x
     let y = p1.y - p2.y
     let z = p1.z - p2.z
-    let yPos = 0.5 - y * d / z
-    let xPos = 0.5 - x * d / z
+    let yPos = p2.y - y * d / z
+    let xPos = p2.x - x * d / z
     return [xPos, yPos]
-  }
+}
+
+function inRange(a, b, range){
+    return (a < b + range && a > b - range)
+}
+
+function triggered(f1, f2, t1, t2) {
+    let range = Math.abs(2*f2.z)
+    console.log(range)
+
+    if ( inRange(t1.y, f2.y, range) && inRange(t1.x, f2.x, range) && inRange(t1.z, f2.z, range)) return true
+    return false
+}
 
 // Present a control panel through which the user can manipulate the solution
 // options.
