@@ -186,7 +186,7 @@ function addClock(type, duration=200) {
             let objectPos = object.object.position
             // console.log(collisionDetection(cursorPos, objectPos)))
             // console.log(render(object))
-            if(frame === object.killAt || render(object)) {
+            if(frame === object.killAt || render(object, pointer.x, pointer.y)) {
                 scene.remove(object.object)
                 spawnedObjects.splice(i, 1)
                 i--
@@ -272,7 +272,7 @@ function onPointerMove(event) {
     // cursorPos.copy( camera.position ).add( vec.multiplyScalar( distance ) );
 }
 
-function rayCollisionDetection(object, x, y) {
+function render(object, x, y) {
 
     let pointer = new THREE.Vector2(x, y)
 
