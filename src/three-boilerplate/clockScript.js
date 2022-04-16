@@ -184,8 +184,9 @@ function addClock(type, duration=200) {
         for(let i in spawnedObjects) {
             let object = spawnedObjects[i]
             let objectPos = object.object.position
-            console.log(collisionDetection(cursorPos, objectPos))
-            if(frame === object.killAt ) {
+            // console.log(collisionDetection(cursorPos, objectPos)))
+            // console.log(render(object))
+            if(frame === object.killAt || render(object)) {
                 scene.remove(object.object)
                 spawnedObjects.splice(i, 1)
                 i--
@@ -245,10 +246,11 @@ const pointer = new THREE.Vector3();
 var vec = new THREE.Vector3(); // create once and reuse
 var cursorPos = new THREE.Vector3(); // create once and reuse
 
-function onPointerMove( event ) {
+function onPointerMove(event) {
 
 	// calculate pointer position in normalized device coordinates
 	// (-1 to +1) for both components
+
 
 	pointer.x = ( event.clientX / window.innerWidth ) * 2 - 1;
 	pointer.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
@@ -256,35 +258,35 @@ function onPointerMove( event ) {
 
     // Different approach from raycasting
 
-    vec.set(
-        ( event.clientX / window.innerWidth ) * 2 - 1,
-        - ( event.clientY / window.innerHeight ) * 2 + 1,
-        0.5 );
+    // vec.set(
+    //     ( event.clientX / window.innerWidth ) * 2 - 1,
+    //     - ( event.clientY / window.innerHeight ) * 2 + 1,
+    //     0.5 );
 
-    vec.unproject( camera );
+    // vec.unproject( camera );
 
-    vec.sub( camera.position ).normalize();
+    // vec.sub( camera.position ).normalize();
 
-    var distance = - camera.position.z / vec.z;
+    // var distance = - camera.position.z / vec.z;
 
-    cursorPos.copy( camera.position ).add( vec.multiplyScalar( distance ) );
+    // cursorPos.copy( camera.position ).add( vec.multiplyScalar( distance ) );
 }
 
-function render() {
+function rayCollisionDetection(object, x, y) {
+
+    let pointer = new THREE.Vector2(x, y)
 
 	// update the picking ray with the camera and pointer position
-	raycaster.setFromCamera( pointer, camera );
+	raycaster.setFromCamera(pointer, camera );
 
 	// calculate objects intersecting the picking ray
 	const intersects = raycaster.intersectObjects( scene.children );
 
 	for ( let i = 0; i < intersects.length; i ++ ) {
-
-		intersects[ i ].object.material.color.set( 0xff0000 );
-
+        if(intersects[i].object == object.object.children[0]) return true;
 	}
 
-	renderer.render( scene, camera );
+    return false;
 }
 
 window.addEventListener( 'mousemove', onPointerMove );
