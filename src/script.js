@@ -140,8 +140,8 @@ function normalizeHand(p1, p2, d) {
     let x = p1['x'] - p2['x'];
     let y = p1['y'] - p2['y'];
     let z = p1['z'] - p2['z'];
-    let yPos = p2['y'] - y*(60)*z;//(z / x) * d;
-    let xPos = p2['x'] - x*(60)*z;
+    let yPos = p2['y'] - y*(0.3)/z;//(z / x) * d;
+    let xPos = p2['x'] - x*(0.3)/z;
     return [xPos, yPos];
   }
 
