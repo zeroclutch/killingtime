@@ -3,6 +3,7 @@ const mpHands = window;
 const drawingUtils = window;
 const controls = window;
 const controls3d = window;
+const meterToPixels = 3779.5275590551;
 // Usage: testSupport({client?: string, os?: string}[])
 // Client and os are regular expressions.
 // See: https://cdn.jsdelivr.net/npm/device-detector-js@2.2.10/README.md for
@@ -111,7 +112,7 @@ function onResults(results) {
         grid.updateLandmarks([]);
     }
     if (results.multiHandLandmarks && results.multiHandLandmarks.length > 0) 
-        console.log(normalizeHand(results.multiHandLandmarks[0][8], results.multiHandLandmarks[0][5], 1));
+        console.log(normalizeHand(results.multiHandLandmarks[0][8], results.multiHandLandmarks[0][5], meterToPixels));
 }
 const hands = new mpHands.Hands(config);
 hands.onResults(onResults);
