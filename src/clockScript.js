@@ -9,6 +9,14 @@ import { getPosition, getReady, getTrigger } from './handScript.js'
 
 // Add timer
 let frame = 0
+let score = 0
+let time = 60
+let dirs = [];  // directions
+let parts = []; // particles
+// explosion parameters
+let movementSpeed = 35;
+let totalObjects = 500;
+let objectSize = 3;
 
 // Initialize scene and renderer
 let scene = new THREE.Scene();
@@ -104,10 +112,11 @@ const OBJECTS = [
 
 const CLOCK_TYPES = [
     { TYPE: 0, POINTS: 1, material: { shininess: 10, color: new THREE.Color("rgb(244, 84, 84)"), } },
-    { TYPE: 1, POINTS: 2, material: { shininess: 10, color: new THREE.Color("rgb(168, 123, 175)"), } },
-    { TYPE: 2, POINTS: 5, material: { shininess: 10, color: new THREE.Color("rgb(49, 193, 115)"), } },
-    { TYPE: 3, POINTS: 10, material:{ shininess: 10, color: new THREE.Color("rgb(37, 167, 185)"), } },
-    { TYPE: 4, POINTS: 25, material:{ shininess: 10, color: new THREE.Color("rgb(255, 203, 70)"), } },
+    // { TYPE: 1, POINTS: 2, material: { shininess: 10, color: new THREE.Color("rgb(168, 123, 175)"), } },
+    // { TYPE: 2, POINTS: 5, material: { shininess: 10, color: new THREE.Color("rgb(49, 193, 115)"), } },
+    // { TYPE: 3, POINTS: 10, material:{ shininess: 10, color: new THREE.Color("rgb(37, 167, 185)"), } },
+    // { TYPE: 4, POINTS: 25, material:{ shininess: 10, color: new THREE.Color("rgb(255, 203, 70)"), } },
+    { TYPE: 1, POINTS: 0, material:{ shininess: 10, color: new THREE.Color("rgb(0, 0, 0)"), } },
 ]
 
 // Current list of clocks
@@ -267,6 +276,10 @@ const cursor = new THREE.Mesh( cursorGeometry, cursorMaterial );
             } else if (collision(object, pointer.x, pointer.y) && isTriggered) {
                 updateScore(object.points)
                 updateTime(4)
+                console.log(object.type)
+                if(object.type > 0) {
+                    time = 0
+                }
                 killClock(i, object.object.position.x, object.object.position.y)
                 i--
             }
@@ -403,10 +416,9 @@ function moveCursor(x,y, isTriggered) {
 
 // window.addEventListener( 'pointermove', onPointerMove );
 
-/* Game variables */
+/* Game functions */
 
-let score = 0
-let time = 5
+
 
 function updateScore(increment) {
     score += increment
@@ -414,9 +426,15 @@ function updateScore(increment) {
 }
 
 function updateTime(increment) {
-    console.log(time)
     time += increment
     renderTime(time)
+    if(time < 0) {
+        timesUp(true)
+    }
+}
+
+function timesUp(isDone=false) {
+    document.getElementById("times-up").style.display = isDone ? "flex" : "hidden"
 }
  
 function renderTime(seconds) {
@@ -429,12 +447,7 @@ decrementTime = setInterval(() => {
     if(time > -1) updateTime(-1)
 }, 1000)
 
-let dirs = [];  // directions
-let parts = []; // particles
-// explosion parameters
-let movementSpeed = 35;
-let totalObjects = 500;
-let objectSize = 3;
+
 
 function ExplodeAnimation(x, y, color)
 {
