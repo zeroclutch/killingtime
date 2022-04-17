@@ -43,9 +43,13 @@ When Peter Parker builds his new suit in *Spider-man: Far From Home*, or when Ob
 
 ## How we built it
 
-Utilizing technologies like *Three.JS*, *MediaPipe*, and *Tensorflow*, we created a fun, interactive game utilizing faster and faster spawns of clocks for you to destroy.
-After designing our game in Figma, we utilized MediaPipe and Tensorflow to grab the various positions of nodes in the hand; by relating positions of specific nodes to one another,
-we can perform a series of calculations to determine whether the user has chosen to shoot and where the user is aiming their finger-gun. In order to convert the direction where your finger points to the in-game 3-D environment, we had to convert the real-life 3-D points of the hand into 2-D points to match the environment; only afterwards, converting them back into 3-D points in the Three.JS scene to determine what clocks you're aiming at. In modeling our game, we utilized JSON Objects and a parametric function to model the clocks, their spawn rates, and their individual behaviors; they'll float up and, due to our scene's "gravity", fall down much faster. Incorporating a fun and light user experience inspired us to create and design a cartoon-themed background alongside lo-fi music and fun sound effects.
+Utilizing technologies including *Three.JS*, *MediaPipe*, and *Tensorflow*, we created a fun, interactive game utilizing faster and faster spawns of clocks for you to destroy.
+
+We used machine vision to identify the markers on the user's hand, and developed our own algorithm to translate that data into a point on a 2D coordinate plane. We performed a series of calculations to determine whether the user has chosen to shoot and where the user is aiming their finger-gun.
+
+In order to convert the direction where your finger points to the in-game 3-D environment, we had to convert the real-life 3-D points of the hand into 2-D points to match the environment; only afterwards, converting them back into 3-D points in the Three.JS scene to determine what clocks you're aiming at.
+
+In modeling our game, we used parametric equations to model the clocks in xyz space, developed their spawn rates, and their individual behaviors. They'll float up and, due to our scene's "gravity", fall down much faster. Incorporating a fun and light user experience inspired us to create and design a cartoon-themed background alongside lo-fi music and fun sound effects.
 
 ## Challenges we ran into
 
