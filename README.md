@@ -49,18 +49,19 @@ We used machine vision to identify the markers on the user's hand, and developed
 
 In order to convert the direction where your finger points to the in-game 3-D environment, we had to convert the real-life 3-D points of the hand into 2-D points to match the environment; only afterwards, converting them back into 3-D points in the Three.JS scene to determine what clocks you're aiming at.
 
-In modeling our game, we used parametric equations to model the clocks in xyz space, developed their spawn rates, and their individual behaviors. They'll float up and, due to our scene's "gravity", fall down much faster. Incorporating a fun and light user experience inspired us to create and design a cartoon-themed background alongside lo-fi music and fun sound effects.
+In modeling our game, we used parametric equations to model the clocks in xyz space, developed their spawn rates, and their individual behaviors. They'll float up and, due to our scene's "gravity", fall down at the same rate. Incorporating a fun and light user experience inspired us to create and design a cartoon-themed background alongside lo-fi music and fun sound effects.
 
 ## Challenges we ran into
 
-* Three of us were learning JavaScript for the first time
-* Clocks wouldn't render on MacOS
-* Hitboxes dependent on orientation of clock in 3D space
-* Algorithm for interpreting cursor/trigger
+* Three of us were learning JavaScript for the first time—for a complex app entirely in JavaScript
+* Dealing with coordinate mapping with unknown orientations
+* Developing accurate positioning hitboxes for the clock
+* Creating an algorithm for interpreting cursor/trigger with smoothness and fidelity
 * Making cursor stable (stability/latency tradeoff)
-* WASM is a black box, when something goes wrong its near impossible to debug
+* WebAssembly is near impossible to debug
 * When a hand is directly in front of camera and titled, the model has trouble detecting trigger fingers
 * Modern browsers abide by strict autoplay policies that we had to work around
+* Our clocks didn't even spawn on our deployed server!
 
 ## Accomplishments we're proud of
 
