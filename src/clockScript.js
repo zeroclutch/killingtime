@@ -149,10 +149,10 @@ function addObject(object, killAfter) {
     // Adjust params 
     object.killAt = frame + (killAfter || 0)
     object.createdAt = frame
-    object.aX = randomBetween(-8, 8)
-    object.aY = randomBetween(-0.3, -0.3)
+    object.aX = randomBetween(-5, 5)
+    object.aY = randomBetween(-0.3, -0.5)
     object.speed = randomBetween(0.1, 0.5)
-    object.height = Math.round(randomBetween(0, 200))
+    object.height = Math.round(randomBetween(0, 150))
 
     object.x = 1000
 
