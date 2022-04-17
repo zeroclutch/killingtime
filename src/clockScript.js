@@ -227,15 +227,12 @@ const cursor = new THREE.Mesh( cursorGeometry, cursorMaterial );
         if(!getReady() || time < 0) return
 
         frame++
-<<<<<<< HEAD
-=======
 
         let pCount = parts.length;
         while(pCount--) {
             parts[pCount].update();
         }
 
->>>>>>> a5669f3316f0b779279646fdce1fc3ba8f14d26f
         // Set cursor position
         [pointer.x, pointer.y] = getPosition()
         let isTriggered = getTrigger()
@@ -268,13 +265,9 @@ const cursor = new THREE.Mesh( cursorGeometry, cursorMaterial );
                 i--
                 continue
             } else if (collision(object, pointer.x, pointer.y) && isTriggered) {
-<<<<<<< HEAD
-                killClock(i, pointer.x, pointer.y)
                 updateScore(object.points)
                 updateTime(4)
-=======
                 killClock(i, object.object.position.x, object.object.position.y)
->>>>>>> a5669f3316f0b779279646fdce1fc3ba8f14d26f
                 i--
             }
         }
