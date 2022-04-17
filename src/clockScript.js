@@ -4,6 +4,8 @@ import { OBJLoader } from 'https://threejs.org/examples/jsm/loaders/OBJLoader.js
 import { RGBELoader } from 'https://threejs.org/examples/jsm/loaders/RGBELoader.js'
 import { MTLLoader } from 'https://threejs.org/examples/jsm/loaders/MTLLoader.js'
 
+import { getPosition, getTrigger } from './handScript.js'
+
 // Add timer
 let frame = 0
 
@@ -14,9 +16,14 @@ scene.background = new THREE.Color( 0xe3eeff )
 let camera = new THREE.PerspectiveCamera( 75, window.innerWidth/window.innerHeight, 0.1, 10000 );
 camera.position.z = 200;
 
-let renderer = new THREE.WebGLRenderer();
+const gameCanvas = document.getElementById('scene')
+
+let renderer = new THREE.WebGLRenderer( { canvas: gameCanvas } );
 renderer.setSize( window.innerWidth, window.innerHeight );
-document.body.appendChild( renderer.domElement );
+// let ctx = renderer.getContext()
+// // console.log(ctx)
+
+
 
 // Allow draggable controls
 let controls = {} // new OrbitControls(camera, renderer.domElement); // Disable orbit controls
@@ -33,7 +40,7 @@ fillLight.position.set(100, 0, 100);
 let backLight = new THREE.DirectionalLight(0xffffff, 1.0);
 backLight.position.set(100, 0, -100).normalize();
 
-const light = new THREE.AmbientLight( 0x404040, 15 ); // soft white light
+const light = new THREE.AmbientLight( 0x404040, 2 ); // soft white light
 
 // Add lighting
 scene.add( light );
@@ -102,9 +109,9 @@ const OBJECTS = [
 ]
 
 const CLOCK_TYPES = [
-    { TYPE: 0, POINTS: 5, material: { shininess: 10, color: new THREE.Color( 1, 0, 0 ),    } },
-    { TYPE: 1, POINTS: 5, material: { shininess: 10, color: new THREE.Color( 1, 0, 0 ), } },
-    { TYPE: 2, POINTS: 5, material: { shininess: 10, color: new THREE.Color( 1, 0, 0 ),  } },
+    { TYPE: 0, POINTS: 5, material: { shininess: 10, color: new THREE.Color( 0.5, 0.5, 1 ),    } },
+    { TYPE: 1, POINTS: 5, material: { shininess: 10, color: new THREE.Color( 0.5, 0.5, 1 ), } },
+    { TYPE: 2, POINTS: 5, material: { shininess: 10, color: new THREE.Color( 0.5, 0.5, 1 ),  } },
 ]
 
 // Current list of clocks
@@ -164,7 +171,7 @@ async function initializeClocks(clocksPerType) {
             const mesh = clock.object.children[0]
             let material = mesh.material[1]
 
-            Object.assign(material, type.material)
+            //Object.assign(material, type.material)
             material.color = type.material.color
 
             createdObjects.push(clock)
@@ -192,9 +199,16 @@ function killClock(i, x, y) {
     scene.remove(spawnedObjects[i].object)
     spawnedObjects.splice(i, 1)
 
+    console.log('killing clock at', x,y)
+
     //let explosion = new ExplodeAnimation(x, y)
     //setTimeout(() => scene.remove(explosion.object), 1000)
 }
+
+
+const cursorGeometry = new THREE.SphereGeometry( 5, 32, 16 );
+const cursorMaterial = new THREE.MeshBasicMaterial( { color: 0xffff00 } );
+const cursor = new THREE.Mesh( cursorGeometry, cursorMaterial );
 
 ;(async function() {
     // Create all possible clocks and cache them
@@ -204,16 +218,24 @@ function killClock(i, x, y) {
 
     let FRAME_DELAY = 400
 
+    scene.add( cursor );
     // Animation loop
     let animate = function () {
+
         requestAnimationFrame( animate );
+
         frame++
+
+        // Set cursor position
+        [pointer.x, pointer.y] = getPosition()
+        let isTriggered = getTrigger()
+        moveCursor(pointer.x, pointer.y, isTriggered)
 
         // Spawn in a new clock
         if(frame % FRAME_DELAY === 0) {
             console.log(frame)
             const clockType = Math.floor(randomBetween(0, CLOCK_TYPES.length))
-            console.log(`Adding clock ${clockType} was successful:`, addClock(clockType, 200))
+            console.log(`Adding clock ${clockType} was successful:`, addClock(clockType, 1000))
             FRAME_DELAY -= 1
         }
 
@@ -231,7 +253,7 @@ function killClock(i, x, y) {
                 spawnedObjects.splice(i, 1)
                 i--
                 continue
-            } else if (collision(object, pointer.x, pointer.y)) {
+            } else if (collision(object, pointer.x, pointer.y) && isTriggered) {
                 killClock(i, pointer.x, pointer.y)
                 i--
             }
@@ -292,21 +314,33 @@ const pointer = new THREE.Vector3();
 // var vec = new THREE.Vector3(); // create once and reuse
 // var cursorPos = new THREE.Vector3(); // create once and reuse
 
-function onPointerMove(event) {
+// function onPointerMove(event) {
 
-	// calculate pointer position in normalized device coordinates
-	// (-1 to +1) for both components
+// 	// calculate pointer position in normalized device coordinates
+// 	// (-1 to +1) for both components
 
-	pointer.x = ( event.clientX / window.innerWidth ) * 2 - 1;
-	pointer.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
+// 	pointer.x = ( event.clientX / window.innerWidth ) * 2 - 1;
+// 	pointer.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
+// }
+
+
+function clamp(a, min, max) {
+    return Math.min(max, Math.max(a, min))
 }
 
+
 function collision(object, x, y) {
-
+    x = clamp(x, -1, 1)
+    y = clamp(y, -1, 1)
+    
+    // 
+    
+	// pointer.x = ( event.clientX / window.innerWidth ) * 2 - 1;
+	// pointer.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
+    // Solve for event.clientX
     let pointer = new THREE.Vector2(x, y)
-
 	// update the picking ray with the camera and pointer position
-	raycaster.setFromCamera(pointer, camera );
+	raycaster.setFromCamera( pointer, camera );
 
 	// calculate objects intersecting the picking ray
 	const intersects = raycaster.intersectObjects( scene.children );
@@ -318,4 +352,42 @@ function collision(object, x, y) {
     return false;
 }
 
-window.addEventListener( 'pointermove', onPointerMove );
+function moveCursor(x,y, isTriggered) {
+    
+    
+    let clientX = (pointer.x + 1) / 2 * window.innerWidth
+    let clientY = -(pointer.y + 1) / 2 * window.innerHeight
+
+    // cursor.style.left = Math.round(clientX) + 'px'
+    // cursor.style.top = Math.round(-clientY) + 'px'
+
+    // const ctx = cursorCanvas.getContext('2d')
+    // let cursor = ctx.ellipse(clientX, clientY, 10, 10)
+
+    const targetZ = 200
+
+    var vec = new THREE.Vector3(); // create once and reuse
+    var pos = new THREE.Vector3(); // create once and reuse
+
+    vec.set( x, -y );
+
+    var distance = ( targetZ - camera.position.z ) / vec.z;
+
+    vec.unproject( camera );
+
+    vec.sub( camera.position ).normalize();
+
+    var distance = - camera.position.z / vec.z;
+
+    pos.copy( camera.position ).add( vec.multiplyScalar( distance ) );
+
+    cursor.position.x = pos.x
+    cursor.position.y = pos.y
+    cursor.position.z = pos.z
+
+    if(isTriggered) cursorMaterial.color = new THREE.Color( 'yellow' )
+    else  cursorMaterial.color = new THREE.Color( 'green' )
+
+}
+
+// window.addEventListener( 'pointermove', onPointerMove );
