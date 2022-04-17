@@ -52,6 +52,12 @@
       left:0;
     }
 
+    .button {
+      border: none;
+      color: #409197;
+      text-decoration: underline;
+    }
+
     #background-video {
       position: absolute;
       height: auto;
@@ -94,6 +100,16 @@
 
     .viewer-widget-js {
       transform: scale(2, 2) translate(25%, 25%);
+    }
+
+    .score-wrapper {
+      font-size: 24px;
+      color: #444;
+      padding: 5px;
+    }
+
+    #final-score {
+      color: #000;
     }
 
     #loading-overlay {
@@ -139,7 +155,8 @@
     <span>
       TIME'S UP!
     </span>
-    <button class="button">Play Again</button>
+    <span class="score-wrapper">you got <span class="score-value" id="final-score">0</span> points</span>
+    <a class="button" href="/">Play Again</a>
   </div>
   <div class="score-field" id="time-field">
     timer <span class="score-value" id="timer-value">0:00</score>
