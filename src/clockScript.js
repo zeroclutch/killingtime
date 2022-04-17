@@ -5,6 +5,7 @@ import { RGBELoader } from 'https://threejs.org/examples/jsm/loaders/RGBELoader.
 import { MTLLoader } from 'https://threejs.org/examples/jsm/loaders/MTLLoader.js'
 
 import { getPosition, getReady, getTrigger } from './handScript.js'
+// import { render } from 'express/lib/response';
 
 // Add timer
 let frame = 0
@@ -88,13 +89,6 @@ const loadObj = (objPath, mtlPath) => {
             resolve(object)
         });
     })
-}
-
-
-
-function ExplodeAnimation(x,y)
-{
-  
 }
 
 // const geometry = new THREE.BoxGeometry( 100, 100, 100 );
@@ -199,6 +193,8 @@ function addClock(type, duration=200) {
 
 function killClock(i, x, y) {
     scene.remove(spawnedObjects[i].object)
+    spawnedObjects.push(new ExplodeAnimation(x, y))
+    render();
     spawnedObjects.splice(i, 1)
 
     console.log('killing clock at', x,y)
@@ -395,3 +391,61 @@ function moveCursor(x,y, isTriggered) {
 }
 
 // window.addEventListener( 'pointermove', onPointerMove );
+
+var dirs = [];
+var parts = [];
+var movementSpeed = 50;
+var totalObjects = 1000;
+var objectSize = 10;
+var colors = [0xFF0FFF, 0xCCFF00, 0xFF000F, 0x996600, 0xFFFFFF];
+
+function render() {
+    requestAnimationFrame(render);
+    var pCount = parts.length;
+    while(pCount--) {
+        parts[pCount].update();
+    }
+
+    renderer.render( scene, camera );
+
+}
+
+function ExplodeAnimation(x,y)
+{
+  var geometry = new THREE.BufferGeometry();
+  
+  for (let i = 0; i < totalObjects; i ++) { 
+    var vertex = new THREE.Vector3();
+    vertex.x = x;
+    vertex.y = y;
+    vertex.z = 0;
+  
+    geometry.setAttribute('position', new THREE.BufferAttribute(vertex));
+    dirs.push({x:(Math.random() * movementSpeed)-(movementSpeed/2),y:(Math.random() * movementSpeed)-(movementSpeed/2),z:(Math.random() * movementSpeed)-(movementSpeed/2)});
+  }
+  var material = new THREE.ParticleBasicMaterial( { size: objectSize,  color: colors[Math.round(Math.random() * colors.length)] });
+  var particles = new THREE.ParticleSystem( geometry, material );
+  
+  this.object = particles;
+  this.status = true;
+  
+  this.xDir = (Math.random() * movementSpeed)-(movementSpeed/2);
+  this.yDir = (Math.random() * movementSpeed)-(movementSpeed/2);
+  this.zDir = (Math.random() * movementSpeed)-(movementSpeed/2);
+  
+  addObject(this.object, 10)
+  
+  this.update = function(){
+    if (this.status == true){
+      var pCount = totalObjects;
+      while(pCount--) {
+        var particle =  this.object.geometry.vertices[pCount]
+        particle.y += dirs[pCount].y;
+        particle.x += dirs[pCount].x;
+        particle.z += dirs[pCount].z;
+      }
+      this.object.geometry.verticesNeedUpdate = true;
+    }
+  }
+  
+}
