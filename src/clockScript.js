@@ -63,7 +63,7 @@ scene.add(backLight);
 
 // Configure 3D model loaders
 let objLoader = new OBJLoader();
-let mtlLoader = new MTLLoader()
+let mtlLoader = new MTLLoader();
 
 new RGBELoader()
     .setDataType( THREE.FloatType )
@@ -89,6 +89,7 @@ const loadObj = (objPath, mtlPath) => {
     return new Promise((resolve) => {
         if(mtlPath) {
             mtlLoader.load(mtlPath, function(materials) {
+                materials.preload();
                 objLoader.setMaterials(materials);
                 objLoader.load(objPath, function (object) {
                     resolve(object)
@@ -110,8 +111,6 @@ const loadObj = (objPath, mtlPath) => {
 // All possible spawnable clocks
 const OBJECTS = [
     { obj: 'blueclock/LP_Classic_Wecker.obj', mtl: 'blueclock/LP_Classic_Wecker.mtl', scaleX: 200, scaleY: 200, scaleZ: 200, },
-    // { obj: 'goldclock/LP_Classic_Wecker.obj', mtl: 'goldclock/LP_Classic_Wecker.mtl', scaleX: 200, scaleY: 200, scaleZ: 200, },
-    // { obj: '/clock3/Clock_obj.obj', mtl: '/clock3/Clock_obj.mtl', scaleX: 150, scaleY: 150, scaleZ: 150,},
 ]
 
 const CLOCK_TYPES = [
@@ -233,7 +232,6 @@ function killClock(i, x, y) {
     // Play kill sound
     sound.play();
 
-    //let explosion = new ExplodeAnimation(x, y)
     setTimeout(() => scene.remove(explosionForClock.object), 750)
 }
 
@@ -285,10 +283,6 @@ const cursor = new THREE.Mesh( cursorGeometry, cursorMaterial );
         // Spawns an moves
         for(let i in spawnedObjects) {
             let object = spawnedObjects[i]
-            // let objectPos = object.object.position
-            // console.log(collisionDetection(cursorPos, objectPos)))
-            // console.log(render(object))
-            // removes object if collision detected or time runs out
             moveParabolic(object.object, object.aX, object.aY, object.height, (frame - object.createdAt - 100),  object.speed)
             rotateObject(object.object)
 
@@ -315,26 +309,6 @@ const cursor = new THREE.Mesh( cursorGeometry, cursorMaterial );
     };
     animate();
 })()
-
-// function collisionDetection(vec1, vec2, dist=35) {
-//     // Checks if two objects or vectors collide
-//     // Takes two position vectors (accessible through a spawned object's object.object.pos)
-//     if(!vec1.x || !vec2.x) return false; // Check that both vectors are valid
-
-
-//     let xDiff = Math.abs(vec1.x - vec2.x)
-//     let yDiff = Math.abs(vec1.y - vec2.y)
-
-//     let euclidDist = Math.sqrt(Math.pow(xDiff, 2) + Math.pow(yDiff, 2))
-
-//     // TODO: if necessary: determine if z's collide
-//     // TODO: decide if euclidean Dist or just simple xDiff and yDiff is better/easier
-
-//     // return xDiff < dist && yDiff < dist
-//     return euclidDist < dist
-// }
-
-
 
 // Move parabolically as a function of time
 
@@ -403,8 +377,6 @@ function collision(object, x, y) {
 }
 
 function moveCursor(x,y, isTriggered) {
-    
-    
     client.x = (pointer.x + 1) / 2 * window.innerWidth
     client.y = -(pointer.y + 1) / 2 * window.innerHeight
 
@@ -443,8 +415,6 @@ function moveCursor(x,y, isTriggered) {
 // window.addEventListener( 'pointermove', onPointerMove );
 
 /* Game functions */
-
-
 
 function updateScore(increment) {
     score += increment

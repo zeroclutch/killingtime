@@ -36,7 +36,7 @@ function testSupport(supportedDevices) {
             `is not well supported at this time, continue at your own risk.`);
     }
 }
-// Our input frames will come from here.
+// input frames come from here.
 const videoElement = document.getElementsByClassName('input_video')[0];
 const canvasElement = document.getElementsByClassName('output_canvas')[0];
 const controlsElement = document.getElementsByClassName('control-panel')[0];
@@ -44,8 +44,7 @@ const canvasCtx = canvasElement.getContext('2d');
 const config = { locateFile: (file) => {
         return `https://cdn.jsdelivr.net/npm/@mediapipe/hands@${mpHands.VERSION}/${file}`;
     } };
-// We'll add this to our control panel later, but we'll save it here so we can
-// call tick() each time the graph runs.
+
 const fpsControl = new controls.FPS();
 // Optimization: Turn off animated spinner after its hiding animation is done.
 const spinner = document.querySelector('.loading');
@@ -93,7 +92,6 @@ function onResults(results) {
     document.body.classList.add('loaded');
     // Update the frame rate.
     fpsControl.tick();
-
     // Draw the overlays.
     canvasCtx.save();
     canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
@@ -189,7 +187,6 @@ function inRange(a, b, range){
 function triggered(f1, f2, t1) {
     let range = (Math.abs(f2.z)**(1/2))/2
     
-    // TODO: Do something special when pointing straight
     let d1 = ((t1.x - f1.x) ** 2 + (t1.y - f1.y) ** 2 + (t1.z- f1.z) ** 2) ** (1/2)
     let d2 = ((t1.x - f2.x) ** 2 + (t1.y - f2.y) ** 2 + (t1.z- f2.z) ** 2) ** (1/2)
     //console.log(d1, d2, range)
@@ -198,8 +195,7 @@ function triggered(f1, f2, t1) {
     return inRange(d2, 0, range) || inRange(d1, 0, range)//inRange(t1.y, f2.y, range) && inRange(t1.x, f2.x, range) && inRange(t1.z, f2.z, range/2))
 }
 
-// Present a control panel through which the user can manipulate the solution
-// options.
+// Present a control panel through which the user can manipulate the options and view camera FPS
 new controls
     .ControlPanel(controlsElement, {
     selfieMode: true,

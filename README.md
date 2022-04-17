@@ -1,35 +1,14 @@
-# Killing Time - LAHacks 2022 submission
+# [Killing Time](https://www.killingtime.tech/) - LAHacks 2022 submission
 
-## Welcome to Killing Time!
-
+[Try our project out](https://www.killingtime.tech/)—it works best on Chrome.
 ----
-
 ## Inspiration
 
-When Peter Parker builds his new suit in *Spider-man: Far From Home*, or when Obi-Wan and Anakin strategize their assault on Geonosis in the *Star Wars* universe, these characters all use technologies that interact seamlessly in 3D space with the motions of their hands. With advancements in technologies in machine vision and hand tracking, these technologies of science fiction are slowly becoming less and less fiction. For our project, we use these technologies to create *Killing Time*, a game in which you use your hands as finger guns to shoot clocks that are thrown at you, earning points in a certain amount of time. Unlike how games like *Valorant's* shooting range require peripherals like a mouse to click or how *Fruit Ninja* requires an active touchscreen, *Killing Time* transforms your computer screen into a 3D touchscreen-like and VR-like experience. Any point to a screen and it will simply work as a mouse. 
+When Peter Parker builds his new suit in Spider-man: Far From Home, or when Obi-Wan and Anakin strategize their assault on Geonosis in the Star Wars universe, these characters all use technologies that interact seamlessly in 3D space with the motions of their hands. With advancements in technologies in machine vision and hand tracking, these technologies of science fiction are slowly becoming reality. For our project, we use these technologies to create *Killing Time*, a game in which you use your hands as finger-guns to shoot clocks that are thrown at you, earning points in a certain amount of time. Unlike how traditional games like *Valorant's* shooting range require peripherals such as a mouse to click or how Fruit Ninja requires an active touchscreen, Killing Time transforms your computer screen into a 3D touchscreen-like and VR-like experience—anywhere, anytime. It's a whole new way to game; just a simple point towards your screen will act as a cursor.
 
 ## What it does
 
-*Killing Time* is a game which uses machine vision and hand tracking to 
-
-## How we built it
-
-In the frontend, we used [React.js](https://reactjs.org/), [Bulma.io](https://bulma.io), [SCSS](https://sass-lang.com/), and Webpack to create an installable progressive web app. We initially designed our project in Figma, and used these HTML, CSS, and JS libraries to develop the application for use. We used a library called "React Pro Camera" in order to access the camera for the barcode scanning. We also performed image cropping using HTML5 Canvas in order to improve the accuracy of our backend's barcode image recognition algorithm. Recovery uses a REST API to communicate with the backend.
-
-### Backend
-
-In the backend, we used Python build a Flask REST API with several data endpoints that could be called in the frontend to handle data instructions. Information about a food's nutrients was fetched from the OpenFoodFacts and FoodData Central databases. Using this data, we kept track of nutrient intake and also calculated how many nutrients a person needed based on their sex and weight. Since OpenFoodFacts stored barcodes of items in their API, we decided to implement a barcode scanner feature that would enhance the user experience by allowing them to simply scan their item instead of having to manually search for it. In order to parse the image of the barcode to a barcode number, we utilized pyzbar to decode the barcode into a string format. We added our own modifications to the barcode decoding process using image manipulation in order to improve the accuracy rate of the scanning.
-
-## UI/UX
-
-The UI / UX was focused on ease-of-use and simplicity. The key aspects to accomplishing this were are as follows.
-
-* Having a straightforward user interaction loop
-* Large, prominent buttons that directed the user
-* Intuitive ways to scan and search for items
-* Consistent visual design
-
-To tackle these challenges, we approached the design process by creating a color and typography system.
+*Killing Time* is a game which uses machine vision and hand tracking to interpolate on-screen cursor position from hand gestures.
 
 <p style="text-align: center;">
 <img src="https://github.com/zeroclutch/killingtime/blob/main/images/Background.png">
@@ -38,42 +17,77 @@ To tackle these challenges, we approached the design process by creating a color
 <img src="https://raw.githubusercontent.com/zeroclutch/killingtime/main/images/clock.png">
 </p>
 
-## What we learned
+## How to play
 
-* How to create progressive web apps (PWAs)
-* Front-end and back-end workflow, including using Postman to test our REST API
-* Developing in React.js--almost all of our team had 0 experience in React
-* Deploying the backend to Google App Engine using Docker
-* Barcode scanning implementation with Python
+* Stand about 1 meter away from your webcam
+* Hold your arm at webcam-level and point towards it
+* Form an L with your hand, with your index finger pointing forwards and your thumb perpendicular to your index
+* To aim, move your fingers in the desired direction
+* To shoot, bring your thumb down close to your index
+* Destroy as many clocks as possible!
 
-## Challenges we faced
+### Rules
+* The game ends when time runs out or when you destroy a black clock
+* Destroying other clocks earns you points and grants you extra time
+* Failing to destroy a clock before it falls takes time away
+* Clock values:
+    * Red : 5 point
+    * Purple : 10 points
+    * Green : 15 points
+    * Blue : 20 points
+    * Gold : 40 points
+    * Black : Game Over
 
+## How we built it
+
+Utilizing technologies like *Three.JS*, *MediaPipe*, and *Tensorflow*, we created a fun, interactive game utilizing faster and faster spawns of clocks for you to destroy.
+After designing our game in Figma, we utilized MediaPipe and Tensorflow to grab the various positions of nodes in the hand; by relating positions of specific nodes to one another,
+we can perform a series of calculations to determine whether the user has chosen to shoot and where the user is aiming their finger-gun. In order to convert the direction where your finger points to the in-game 3-D environment, we had to convert the real-life 3-D points of the hand into 2-D points to match the environment; only afterwards, converting them back into 3-D points in the Three.JS scene to determine what clocks you're aiming at. In modeling our game, we utilized JSON Objects and a parametric function to model the clocks, their spawn rates, and their individual behaviors; they'll float up and, due to our scene's "gravity", fall down much faster. Incorporating a fun and light user experience inspired us to create and design a cartoon-themed background alongside lo-fi music and fun sound effects.
+
+## Challenges we ran into
+
+* Three of us were learning JavaScript for the first time
 * Clocks wouldn't render on MacOS
 * Hitboxes dependent on orientation of clock in 3D space
 * Algorithm for interpreting cursor/trigger
 * Making cursor stable (stability/latency tradeoff)
 * WASM is a black box, when something goes wrong its near impossible to debug
-* When hand is directly in front of camera and titled, model has troubled detecting trigger
+* When a hand is directly in front of camera and titled, the model has trouble detecting trigger fingers
+* Modern browsers abide by strict autoplay policies that we had to work around
 
 ## Accomplishments we're proud of
 
-* Consistent barcode detection through image cropping & post-processing
-* Sexy design (UI, logo)
-* Mobile browser compatibility
+* Collision detection algorithm is accurate
+* Stable and precise finger-to-cursor tracking
+* Animated background (cat's tail, clouds, steam, light)
+* 3D graphics implementation (clock & particle explosions)
+* Overall art theme and game design
 
-## What's next for Recovery
+## What we learned
 
-* Ability to share nutrition progress on social media
-* Allow users to create their own meal plans with custom nutrition quotas
-* Addition of more preset meal plans based on other personalized needs (ex: weight loss, muscle gain, diabetics)
-* Optimize loading times
+* How to mass-produce and manipulate geometric shapes with Three.JS to animate a particle explosion
+* How to utilize machine vision to track hand movements down to each finger's joints
+* How to use projections and vector math to calculate values from 3-D coordinates
+
+## What's next for Killing Time
+
+* Improve trigger detection
+* Improve camera FPS
+* Add power-ups/debuffs to more clocks
+* Support for multiple hands/multiplayer
+* Include a larger variety of clock models
 
 ## Built with
 
 * Figma
-* Python
-* Javascript
+* MediaPipe
+* TensorFlow
+* Three.JS
+* JavaScript
+* SkyPack
 * Blender
+* Vercel
+* Domain.com
 
 ## The team
 
