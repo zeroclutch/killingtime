@@ -184,7 +184,7 @@ async function initializeClocks(clocksPerType) {
             clock.type = type.TYPE
             clock.points = type.POINTS
             const mesh = clock.object.children[0]
-            if(!mesh) {
+            if(mesh) {
                 let material = mesh.material[1]
 
                 Object.assign(material, type.material)
