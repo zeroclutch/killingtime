@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <style>
+            html, body {
+                padding: 0;
+                margin: 0;
+                font-family: 'Ginto Nord Black Italic', sans-serif;
+                font-weight: bold;
+                max-height: 100vh;
+                max-width: 100vw;
+                overflow: hidden;
+            }
+
+            @font-face {
+                font-family: 'Ginto Nord Black Italic';
+                src: url('/fonts/ABCGintoNord-BlackItalic-Trial.otf');
+            }
+            h1 {
+                font-family: 'ABC Ginto Nord Trial';
+                font-style: italic;
+                font-weight: 800;
+                font-size: calc(3vw + 60px);
+                line-height: 115px;
+
+                background: linear-gradient(110.08deg, #F43636 17.64%, #C20000 61.09%);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                background-clip: text;
+                filter: drop-shadow(5px 4px 0px #4A2E07);
+                
+                margin: 0;
+
+            }
+
+            h3 {
+                font-family: 'ABC Ginto Nord Trial';
+                font-style: italic;
+                font-weight: 800;
+                font-size: calc(1vw + 10px);
+                line-height: 36px;
+
+                color: #4A2E07;
+            }
+
+            .left-object {
+                width: 75%;
+                display: inline-block;
+            }
+
+            .right-object {
+                width: 25%;
+                display: inline-block;
+            }
+
+            .background {
+                background-image: url('/images/bgclock.png');
+                background-size: cover;
+                filter: blur(10px);
+                width: 120vw;
+                height: 120vh;
+                position: absolute;
+                top: -10vh;
+                left: -10vw;
+                background-position: center;
+                z-index: -1;
+            }
+
+            .giant-button {
+                position: absolute;
+                width: calc(8vw + 256px);
+                height: calc(2vw + 120px);
+                font-size: calc(2vw + 48px);
+                line-height: 150px;
+                text-align: center;
+                color: white;
+                text-decoration: none;
+
+                filter: drop-shadow(20px 20px 0px #4A2E07);
+                background: #C30101;
+            }
+
+            .giant-button:hover {
+                filter: drop-shadow(10px 10px 0px #4A2E07);
+            }
+
+            .page-content {
+                padding: 10%;
+            }
+
+            .footer {
+                position: absolute;
+                bottom: 20px;
+                text-align: center;
+                color: white;
+                font-size: 24px;
+                left: 50%;
+                transform: translateX(-50%);
+            }
+        </style>
+    </head>
+    <body>
+        <iframe src="landingmusic.ogg" allow="autoplay" style="display:none"></iframe>
+        <!-- <audio controls autoplay loop hidden>
+            <source src="landingmusic.ogg" type="audio/ogg">
+        </audio> -->
+        <div class="background"></div>
+        <div class="page-content">
+            <div class="left-object">
+                <h3>you were just trying to sleep. now you’re...</h3>
+                <h1>KILLING TIME</h1>
+                <h3>there’s no time to waste.</h3>
+            </div>
+            <div class="right-object">
+                <a class="giant-button" href="/index.html">start</a>
+            </div>
+        </div>
+        <div class="footer">A machine vision-based game about stopping alarm clocks. With finger guns.</div>
+        <script>
+            const bg = document.querySelector('.background')
+            document.addEventListener('mousemove', e => {
+                const amount = 50
+                bg.style.transform = `translate(${(e.clientX / window.innerWidth * amount)}px, ${e.clientY / window.innerWidth * amount}px`
+            })
+        </script>
+    </body>
+</html>

@@ -12,12 +12,7 @@ When Peter Parker builds his new suit in *Spider-man: Far From Home*, or when Ob
 
 *Killing Time* is a game which uses machine vision and hand tracking to 
 
-
 ## How we built it
-
-<p style="text-align: center;"><img src="https://raw.githubusercontent.com/tanhuynh226/hackla/main/images/interactionflowchart.png"></p>
-
-### [Frontend](https://github.com/zeroclutch/recovery)
 
 In the frontend, we used [React.js](https://reactjs.org/), [Bulma.io](https://bulma.io), [SCSS](https://sass-lang.com/), and Webpack to create an installable progressive web app. We initially designed our project in Figma, and used these HTML, CSS, and JS libraries to develop the application for use. We used a library called "React Pro Camera" in order to access the camera for the barcode scanning. We also performed image cropping using HTML5 Canvas in order to improve the accuracy of our backend's barcode image recognition algorithm. Recovery uses a REST API to communicate with the backend.
 
@@ -37,32 +32,10 @@ The UI / UX was focused on ease-of-use and simplicity. The key aspects to accomp
 To tackle these challenges, we approached the design process by creating a color and typography system.
 
 <p style="text-align: center;">
-<img src="https://raw.githubusercontent.com/tanhuynh226/hackla/main/images/Fonts.png">
-<img src="https://raw.githubusercontent.com/tanhuynh226/hackla/main/images/Colors.png">
-</p>
-
-From here, we developed prototype wireframes to determine the structure, visual hierarchy, and components for the application.
-
-<p style="text-align: center;">
-<img src="https://raw.githubusercontent.com/tanhuynh226/hackla/main/images/wireframes.png">
-</p>
-
-We then developed a brand identity to further inform our design decisions. We made sure to add special emphasis on the "COV", indicating our app's focus on the recovery of COVID-19 patients.
-
-<p style="text-align: center;">
-<img src="https://raw.githubusercontent.com/tanhuynh226/hackla/main/images/Logo.png">
-</p>
-
-<p style="text-align: center;">
-<img style="padding: 10px" src="https://raw.githubusercontent.com/tanhuynh226/hackla/main/images/Logo-1.png">
-</p>
-
-We developed our full UI, incorporating elements of the natural design that we used in the logo and branding design.
-
-<p style="text-align: center;">
-<img src="https://raw.githubusercontent.com/tanhuynh226/hackla/main/images/Homepage.png">
-<img src="https://raw.githubusercontent.com/tanhuynh226/hackla/main/images/Analysis.png">
-<img src="https://raw.githubusercontent.com/tanhuynh226/hackla/main/images/Search.png">
+<img src="https://github.com/zeroclutch/killingtime/blob/main/images/Background.png">
+<img src="https://raw.githubusercontent.com/zeroclutch/killingtime/main/images/Poster%20(1).png">
+<img src="https://raw.githubusercontent.com/zeroclutch/killingtime/main/images/Poster.png">
+<img src="https://raw.githubusercontent.com/zeroclutch/killingtime/main/images/clock.png">
 </p>
 
 ## What we learned
@@ -75,13 +48,12 @@ We developed our full UI, incorporating elements of the natural design that we u
 
 ## Challenges we faced
 
-* Optimizing the barcode-image recognition to get a higher success rate
-* Nutrient unit conversion from differences in APIs
-* Managing state in React without using a state manager like Redux
-* Handling and sorting from messy and inconsistent databases
-* First time making a mobile PWA
-* Migrating from Heroku to Google Cloud and Docker
-* Managing CORS (Cross-Origin Resource Sharing) between domains, a browser protection
+* Clocks wouldn't render on MacOS
+* Hitboxes dependent on orientation of clock in 3D space
+* Algorithm for interpreting cursor/trigger
+* Making cursor stable (stability/latency tradeoff)
+* WASM is a black box, when something goes wrong its near impossible to debug
+* When hand is directly in front of camera and titled, model has troubled detecting trigger
 
 ## Accomplishments we're proud of
 
