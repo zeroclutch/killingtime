@@ -138,8 +138,9 @@ const OBJECTS = [
 ]
 
 const CLOCK_TYPES = [
-    { TYPE: 0, material: { shininess: 50, specular: new THREE.Color(0x888888), color: new THREE.Color( 0xEF0100 ) } },
-    { TYPE: 1, POINTS: 5, material: { shininess: 50, specular: new THREE.Color(0x888888), color: new THREE.Color( 0xEF0100 ) } },
+    { TYPE: 0, material: { shininess: 50, specular: new THREE.Color(0x888888), color: new THREE.Color( 0xA2DFA8 ) } },
+    { TYPE: 1, POINTS: 5, material: { shininess: 50, specular: new THREE.Color(0x888888), color: new THREE.Color( 0xA669F4 ) } },
+    { TYPE: 2, POINTS: 5, material: { shininess: 50, specular: new THREE.Color(0x888888), color: new THREE.Color( 0xFFB76E ) } },
 ]
 
 // Current list of clocks
@@ -203,6 +204,10 @@ async function initializeClocks(clocksPerType) {
             material.color = type.material.color
 
             createdObjects.push(clock)
+
+            scene.add(clock.object)
+            clock.object.position.y = -500
+            scene.remove(clock.object)
             
 
             console.log(createdObjects, material)
@@ -352,12 +357,10 @@ function render(object, x, y) {
 	const intersects = raycaster.intersectObjects( scene.children );
 
 	for ( let i = 0; i < intersects.length; i ++ ) {
-        if(intersects[i].object == object.object.children[0]) return true;
+        if(intersects[i].object == object.object.children[0]) return intersects[i].object;
 	}
 
     return false;
 }
 
 window.addEventListener( 'pointermove', onPointerMove );
-
-window.requestAnimationFrame(render);
