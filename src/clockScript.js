@@ -11,7 +11,7 @@ let frame = 0
 
 // Initialize scene and renderer
 let scene = new THREE.Scene();
-scene.background = new THREE.Color( 0xe3eeff )
+scene.background = new THREE.Color( 0xC2D0D4 )
 
 let camera = new THREE.PerspectiveCamera( 75, window.innerWidth/window.innerHeight, 0.1, 10000 );
 camera.position.z = 200;
@@ -31,16 +31,20 @@ controls.enableDamping = true;
 controls.dampingFactor = 0.25;
 controls.enableZoom = true;
 
-let keyLight = new THREE.DirectionalLight(new THREE.Color('hsl(30, 100%, 75%)'), 1.0);
+let keyLight = new THREE.DirectionalLight(new THREE.Color('hsl(30, 100%, 75%)'), 0.75);
 keyLight.position.set(-100, 0, 100);
 
-let fillLight = new THREE.DirectionalLight(new THREE.Color('hsl(240, 100%, 75%)'), 0.75);
+let fillLight = new THREE.DirectionalLight(new THREE.Color('hsl(240, 100%, 75%)'), 0.6);
 fillLight.position.set(100, 0, 100);
 
-let backLight = new THREE.DirectionalLight(0xffffff, 1.0);
+let backLight = new THREE.DirectionalLight(0xFFB35C, 1.0);
 backLight.position.set(100, 0, -100).normalize();
 
+<<<<<<< HEAD:src/clockScript.js
 const light = new THREE.AmbientLight( 0x404040, 2 ); // soft white light
+=======
+const light = new THREE.AmbientLight( 0x424242, 1.75 ); // soft white light
+>>>>>>> 131c96a1c362112c970b9f2a94b3aa63a1dc5f53:src/three-boilerplate/clockScript.js
 
 // Add lighting
 scene.add( light );
@@ -109,9 +113,11 @@ const OBJECTS = [
 ]
 
 const CLOCK_TYPES = [
-    { TYPE: 0, POINTS: 5, material: { shininess: 10, color: new THREE.Color( 0.5, 0.5, 1 ),    } },
-    { TYPE: 1, POINTS: 5, material: { shininess: 10, color: new THREE.Color( 0.5, 0.5, 1 ), } },
-    { TYPE: 2, POINTS: 5, material: { shininess: 10, color: new THREE.Color( 0.5, 0.5, 1 ),  } },
+    { TYPE: 0, POINTS: 1, material: { shininess: 10, color: new THREE.Color("rgb(244, 84, 84)"), } },
+    { TYPE: 1, POINTS: 2, material: { shininess: 10, color: new THREE.Color("rgb(168, 123, 175)"), } },
+    { TYPE: 2, POINTS: 5, material: { shininess: 10, color: new THREE.Color("rgb(49, 193, 115)"), } },
+    { TYPE: 3, POINTS: 10, material:{ shininess: 10, color: new THREE.Color("rgb(37, 167, 185)"), } },
+    { TYPE: 4, POINTS: 25, material:{ shininess: 10, color: new THREE.Color("rgb(255, 203, 70)"), } },
 ]
 
 // Current list of clocks
