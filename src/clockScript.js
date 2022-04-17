@@ -40,11 +40,7 @@ fillLight.position.set(100, 0, 100);
 let backLight = new THREE.DirectionalLight(0xFFB35C, 1.0);
 backLight.position.set(100, 0, -100).normalize();
 
-<<<<<<< HEAD:src/clockScript.js
-const light = new THREE.AmbientLight( 0x404040, 2 ); // soft white light
-=======
 const light = new THREE.AmbientLight( 0x424242, 1.75 ); // soft white light
->>>>>>> 131c96a1c362112c970b9f2a94b3aa63a1dc5f53:src/three-boilerplate/clockScript.js
 
 // Add lighting
 scene.add( light );
