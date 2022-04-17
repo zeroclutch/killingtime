@@ -1,14 +1,17 @@
 # [Killing Time](https://www.killingtime.tech/) - LAHacks 2022 submission
 
 [Try our project out](https://www.killingtime.tech/)—it works best on Chrome.
+
 ----
-## Inspiration
 
-When Peter Parker builds his new suit in Spider-man: Far From Home, or when Obi-Wan and Anakin strategize their assault on Geonosis in the Star Wars universe, these characters all use technologies that interact seamlessly in 3D space with the motions of their hands. With advancements in technologies in machine vision and hand tracking, these technologies of science fiction are slowly becoming reality. For our project, we use these technologies to create *Killing Time*, a game in which you use your hands as finger-guns to shoot clocks that are thrown at you, earning points in a certain amount of time. Unlike how traditional games like *Valorant's* shooting range require peripherals such as a mouse to click or how Fruit Ninja requires an active touchscreen, Killing Time transforms your computer screen into a 3D touchscreen-like and VR-like experience—anywhere, anytime. It's a whole new way to game; just a simple point towards your screen will act as a cursor.
-
-## What it does
+## Description
 
 *Killing Time* is a game which uses machine vision and hand tracking to interpolate on-screen cursor position from hand gestures.
+
+## Inspiration
+
+When Peter Parker builds his new suit in *Spider-man: Far From Home*, or when Obi-Wan and Anakin strategize their assault on Geonosis in the *Star Wars* universe, these characters all use technologies that interact seamlessly in 3D space with the motions of their hands. With advancements in technologies in machine vision and hand tracking, these technologies of science fiction are slowly becoming reality. For our project, we use these technologies to create *Killing Time*, a game in which you use your hands as finger-guns to shoot clocks that are thrown at you, earning points in a certain amount of time. Unlike how traditional games like *Valorant's* shooting range require peripherals such as a mouse to click or how Fruit Ninja requires an active touchscreen, Killing Time transforms your computer screen into a 3D touchscreen-like and VR-like experience—anywhere, anytime. It's a whole new way to use a device; just a simple point towards your screen will act as a cursor.
+
 
 <p style="text-align: center;">
 <img src="https://github.com/zeroclutch/killingtime/blob/main/images/Background.png">
@@ -31,12 +34,12 @@ When Peter Parker builds his new suit in Spider-man: Far From Home, or when Obi-
 * Destroying other clocks earns you points and grants you extra time
 * Failing to destroy a clock before it falls takes time away
 * Clock values:
-    * Red : 5 point
-    * Purple : 10 points
-    * Green : 15 points
-    * Blue : 20 points
-    * Gold : 40 points
-    * Black : Game Over
+    * 🔴 Red: 5 point
+    * 🟣 Purple: 10 points
+    * 🟢 Green: 15 points
+    * 🔵 Blue: 20 points
+    * 🟡 Gold: 40 points
+    * ⚫️ Black: Game Over
 
 ## How we built it
 

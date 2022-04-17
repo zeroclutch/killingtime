@@ -188,8 +188,10 @@ async function initializeClocks(clocksPerType) {
 
                 Object.assign(material, type.material)
                 material.color = type.material.color
+                material.side = THREE.DoubleSide
             } else {
                 const material = new THREE.MeshBasicMaterial( { color: type.material.color } );
+                material.side = THREE.DoubleSide
                 const geometry = new THREE.BufferGeometry();
                 
                 geometry.setAttribute('position', new THREE.BufferAttribute(Float32Array.from(clockGeometry.position.array), 3))
