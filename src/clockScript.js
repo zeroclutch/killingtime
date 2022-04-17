@@ -5,6 +5,7 @@ import { RGBELoader } from 'https://threejs.org/examples/jsm/loaders/RGBELoader.
 import { MTLLoader } from 'https://threejs.org/examples/jsm/loaders/MTLLoader.js'
 
 import { getPosition, getReady, getTrigger } from './handScript.js'
+// import { render } from 'express/lib/response';
 
 // Add timer
 let frame = 0
@@ -88,13 +89,6 @@ const loadObj = (objPath, mtlPath) => {
             resolve(object)
         });
     })
-}
-
-
-
-function ExplodeAnimation(x,y)
-{
-  
 }
 
 // const geometry = new THREE.BoxGeometry( 100, 100, 100 );
@@ -199,13 +193,18 @@ function addClock(type, duration=200) {
 }
 
 function killClock(i, x, y) {
-    scene.remove(spawnedObjects[i].object)
+    const object = spawnedObjects[i].object
+    scene.remove(object)
+    
+    const explosionForClock = new ExplodeAnimation(x, y, CLOCK_TYPES[spawnedObjects[i].type].material.color)
+    parts.push(explosionForClock)
+    scene.add(explosionForClock.object)
     spawnedObjects.splice(i, 1)
 
     console.log('killing clock at', x,y)
 
     //let explosion = new ExplodeAnimation(x, y)
-    //setTimeout(() => scene.remove(explosion.object), 1000)
+    setTimeout(() => scene.remove(explosionForClock.object), 750)
 }
 
 
@@ -228,6 +227,15 @@ const cursor = new THREE.Mesh( cursorGeometry, cursorMaterial );
         if(!getReady() || time < 0) return
 
         frame++
+<<<<<<< HEAD
+=======
+
+        let pCount = parts.length;
+        while(pCount--) {
+            parts[pCount].update();
+        }
+
+>>>>>>> a5669f3316f0b779279646fdce1fc3ba8f14d26f
         // Set cursor position
         [pointer.x, pointer.y] = getPosition()
         let isTriggered = getTrigger()
@@ -246,10 +254,13 @@ const cursor = new THREE.Mesh( cursorGeometry, cursorMaterial );
         // Spawns an moves
         for(let i in spawnedObjects) {
             let object = spawnedObjects[i]
-            let objectPos = object.object.position
+            // let objectPos = object.object.position
             // console.log(collisionDetection(cursorPos, objectPos)))
             // console.log(render(object))
             // removes object if collision detected or time runs out
+            moveParabolic(object.object, object.aX, object.aY, object.height, (frame - object.createdAt - 100),  object.speed)
+            rotateObject(object.object)
+
             if(frame === object.killAt) {
                 scene.remove(object.object)
                 spawnedObjects.splice(i, 1)
@@ -257,14 +268,15 @@ const cursor = new THREE.Mesh( cursorGeometry, cursorMaterial );
                 i--
                 continue
             } else if (collision(object, pointer.x, pointer.y) && isTriggered) {
+<<<<<<< HEAD
                 killClock(i, pointer.x, pointer.y)
                 updateScore(object.points)
                 updateTime(4)
+=======
+                killClock(i, object.object.position.x, object.object.position.y)
+>>>>>>> a5669f3316f0b779279646fdce1fc3ba8f14d26f
                 i--
             }
-            
-            moveParabolic(object.object, object.aX, object.aY, object.height, (frame - object.createdAt - 100),  object.speed)
-            rotateObject(object.object)
         }
 
         renderer.render(scene, camera);
@@ -316,6 +328,7 @@ function rotateObject(object, rad) {
 // edmund's workspace
 const raycaster = new THREE.Raycaster();
 const pointer = new THREE.Vector3();
+const client = { x: 0, y: 0 }
 // var vec = new THREE.Vector3(); // create once and reuse
 // var cursorPos = new THREE.Vector3(); // create once and reuse
 
@@ -360,8 +373,8 @@ function collision(object, x, y) {
 function moveCursor(x,y, isTriggered) {
     
     
-    let clientX = (pointer.x + 1) / 2 * window.innerWidth
-    let clientY = -(pointer.y + 1) / 2 * window.innerHeight
+    client.x = (pointer.x + 1) / 2 * window.innerWidth
+    client.y = -(pointer.y + 1) / 2 * window.innerHeight
 
     // cursor.style.left = Math.round(clientX) + 'px'
     // cursor.style.top = Math.round(-clientY) + 'px'
@@ -423,3 +436,49 @@ decrementTime = setInterval(() => {
     if(time > -1) updateTime(-1)
 }, 1000)
 
+let dirs = [];  // directions
+let parts = []; // particles
+// explosion parameters
+let movementSpeed = 35;
+let totalObjects = 500;
+let objectSize = 3;
+
+function ExplodeAnimation(x, y, color)
+{
+  let geometry = new THREE.BufferGeometry();
+  const vertices = new Array();
+  for (let i = 0; i < totalObjects; i ++) { 
+     vertices.push(x, y, 0)
+  
+    dirs.push({x:(Math.random() * movementSpeed)-(movementSpeed/2),y:(Math.random() * movementSpeed)-(movementSpeed/2),z:(Math.random() * movementSpeed)-(movementSpeed/2)});
+  }
+  const float32Vertices = Float32Array.from(vertices)
+
+  geometry.setAttribute('position', new THREE.BufferAttribute(float32Vertices, 3));
+  let material = new THREE.PointsMaterial( { size: objectSize, color });
+  let particles = new THREE.Points( geometry, material );
+  
+  this.object = particles;
+  this.status = true;
+  
+  this.xDir = (Math.random() * movementSpeed)-(movementSpeed/2);
+  this.yDir = (Math.random() * movementSpeed)-(movementSpeed/2);
+  this.zDir = (Math.random() * movementSpeed)-(movementSpeed/2);
+  
+  this.update = function(){
+    if (this.status == true){
+      let pCount = totalObjects;
+      let particles =  this.object.geometry.getAttribute('position').array // THREE.BufferAttribute(float32Vertices, 3)
+    //   console.log(this.object.geometry.getAttribute('position'))
+      for(let i = 0; i < particles.length; i += 3) {
+        pCount--
+        particles[i] += dirs[pCount].x;
+        particles[i + 1] += dirs[pCount].y;
+        particles[i + 2] += dirs[pCount].z;
+      }
+      this.object.geometry.setAttribute('position', new THREE.BufferAttribute(particles, 3))
+      this.object.geometry.needsUpdate = true;
+    }
+  }
+  
+}
