@@ -111,13 +111,14 @@ const OBJECTS = [
 ]
 
 const CLOCK_TYPES = [
-    { TYPE: 0, POINTS: 1, material: { shininess: 30, color: new THREE.Color("rgb(244, 84, 84)"), } },
-    { TYPE: 1, POINTS: 2, material: { shininess: 30, color: new THREE.Color("rgb(168, 123, 175)"), } },
-    { TYPE: 2, POINTS: 5, material: { shininess: 30, color: new THREE.Color("rgb(49, 193, 115)"), } },
-    { TYPE: 3, POINTS: 10, material:{ shininess: 30, color: new THREE.Color("rgb(37, 167, 185)"), } },
-    { TYPE: 4, POINTS: 25, material:{ shininess: 30, color: new THREE.Color("rgb(255, 203, 70)"), } },
-    { TYPE: 5, POINTS: 0, material:{ shininess: 30, color: new THREE.Color("rgb(0, 0, 0)"), } },
+    { TYPE: 0, POINTS: 0,  odds: 0.25, material: { shininess: 30, color: new THREE.Color("rgb(40, 40, 40)"), } },
+    { TYPE: 1, POINTS: 5,  odds: 0.5, material: { shininess: 30, color: new THREE.Color("rgb(244, 84, 84)"), } },
+    { TYPE: 2, POINTS: 10, odds: 0.65, material: { shininess: 30, color: new THREE.Color("rgb(168, 123, 175)"), } },
+    { TYPE: 3, POINTS: 15, odds: 0.8, material: { shininess: 30, color: new THREE.Color("rgb(49, 193, 115)"), } },
+    { TYPE: 4, POINTS: 20, odds: 0.9, material: { shininess: 30, color: new THREE.Color("rgb(37, 167, 185)"), } },
+    { TYPE: 5, POINTS: 40, odds: 1, material: { shininess: 50, color: new THREE.Color("rgb(255, 203, 70)"), } },
 ]
+
 
 // Current list of clocks
 const spawnedObjects = []
@@ -149,9 +150,12 @@ function addObject(object, killAfter) {
     // Adjust params 
     object.killAt = frame + (killAfter || 0)
     object.createdAt = frame
-    object.aX = randomBetween(-5, 5)
+
+    let randomNegative = Math.random() > 0.5 ? -1 : 1
+
+    object.aX = randomBetween(3, 5) * randomNegative
     object.aY = randomBetween(-0.3, -0.5)
-    object.speed = randomBetween(0.1, 0.5)
+    object.speed = randomBetween(0.2, 0.5)
     object.height = Math.round(randomBetween(0, 150))
 
     object.x = 1000
@@ -193,6 +197,16 @@ async function initializeClocks(clocksPerType) {
     return true
 }
 
+function selectClockType() {
+    let seed = Math.random()
+    for(let i = 0; i < CLOCK_TYPES.length; i++) {
+        let type = CLOCK_TYPES[i]
+        console.log(seed, type.odds)
+        if(seed < type.odds) return type.TYPE
+    }
+    return 0
+}
+
 function addClock(type, duration=200) {
     // Try to find an available clock to add
     let clock = createdObjects.find(obj => !obj.object.parent && obj.type === type)
@@ -222,7 +236,7 @@ function killClock(i, x, y) {
 
 let isTriggered = false
 let isReady = true
-let timeElasped = 0
+let timeElapsed = 0
 
 const cursorGeometry = new THREE.SphereGeometry( 5, 32, 16 );
 const cursorMaterial = new THREE.MeshBasicMaterial( { color: 0xffff00 } );
@@ -230,7 +244,7 @@ const cursor = new THREE.Mesh( cursorGeometry, cursorMaterial );
 
 ;(async function() {
     // Create all possible clocks and cache them
-    await initializeClocks(100)
+    await initializeClocks(5)
     // Add a clock of type 0 for 200 frames. If there are no clocks available, this returns false
     console.log(addClock(0, 200))
 
@@ -259,8 +273,8 @@ const cursor = new THREE.Mesh( cursorGeometry, cursorMaterial );
         if(frame % FRAME_DELAY === 0) {
             console.log(FRAME_DELAY)
             const clockType = Math.floor(randomBetween(0, CLOCK_TYPES.length))
-            console.log(`Adding clock ${clockType} was successful:`, addClock(clockType, 1000))
-            FRAME_DELAY = Math.max(400 - (timeElasped * 5), 5) // min spawn speed is 5 seconds
+            console.log(`Adding clock ${clockType} was successful:`, addClock(selectClockType(), 1000))
+            FRAME_DELAY = Math.max(400 - (timeElapsed * 5), 20) // min spawn speed is 20 frames
         }
 
         // controls.update();
@@ -285,7 +299,7 @@ const cursor = new THREE.Mesh( cursorGeometry, cursorMaterial );
                 updateScore(object.points)
                 updateTime(4)
                 console.log(object.type)
-                if(object.type > 4) {
+                if(object.type == 0) {
                     time = 0
                 }
                 killClock(i, object.object.position.x, object.object.position.y)
@@ -418,8 +432,8 @@ function moveCursor(x,y, isTriggered) {
     cursor.position.y = pos.y
     cursor.position.z = pos.z
 
-    if(isTriggered) cursorMaterial.color = new THREE.Color( 'yellow' )
-    else  cursorMaterial.color = new THREE.Color( 'green' )
+    if(isTriggered) cursorMaterial.color = new THREE.Color( '#2c8f45' )
+    else  cursorMaterial.color = new THREE.Color( '#e32b47' )
 
 }
 
@@ -455,7 +469,7 @@ function renderTime(seconds) {
 
 let decrementTime = setInterval(() => {
     if(time > -1) updateTime(-1)
-    timeElasped += 1
+    timeElapsed += 1
 }, 1000)
 
 
