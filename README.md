@@ -68,7 +68,7 @@ In modeling our game, we used parametric equations to model the clocks in xyz sp
 * Stable and precise finger-to-cursor tracking
 * Animated background (cat's tail, clouds, steam, light)
 * 3D graphics implementation (clock & particle explosions)
-* Overall art theme and game design
+* Overall art theme and game design, complete with music and effects
 
 ## What we learned
 
