@@ -9,7 +9,7 @@ let frame = 0
 
 // Initialize scene and renderer
 let scene = new THREE.Scene();
-scene.background = new THREE.Color( 0xe3eeff )
+scene.background = new THREE.Color( 0xC2D0D4 )
 
 let camera = new THREE.PerspectiveCamera( 75, window.innerWidth/window.innerHeight, 0.1, 10000 );
 camera.position.z = 200;
@@ -33,7 +33,7 @@ fillLight.position.set(100, 0, 100);
 let backLight = new THREE.DirectionalLight(0xffffff, 1.0);
 backLight.position.set(100, 0, -100).normalize();
 
-const light = new THREE.AmbientLight( 0x404040, 15 ); // soft white light
+const light = new THREE.AmbientLight( 0x404040, 1.75 ); // soft white light
 
 // Add lighting
 scene.add( light );
@@ -102,9 +102,10 @@ const OBJECTS = [
 ]
 
 const CLOCK_TYPES = [
-    { TYPE: 0, POINTS: 5, material: { shininess: 10, color: new THREE.Color( 1, 0, 0 ),    } },
-    { TYPE: 1, POINTS: 5, material: { shininess: 10, color: new THREE.Color( 1, 0, 0 ), } },
-    { TYPE: 2, POINTS: 5, material: { shininess: 10, color: new THREE.Color( 1, 0, 0 ),  } },
+    { TYPE: 0, POINTS: 1, material: { shininess: 10, color: new THREE.Color("rgb(244, 84, 84)"), } },
+    { TYPE: 1, POINTS: 2, material: { shininess: 10, color: new THREE.Color("rgb(168, 123, 175)"), } },
+    { TYPE: 2, POINTS: 5, material: { shininess: 10, color: new THREE.Color("rgb(49, 193, 115)"), } },
+    { TYPE: 3, POINTS: 10, material:{ shininess: 10, color: new THREE.Color("rgb(255, 203, 70)"), } },
 ]
 
 // Current list of clocks

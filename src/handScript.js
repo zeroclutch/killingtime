@@ -156,7 +156,6 @@ function onResults(results) {
 }
 const hands = new mpHands.Hands(config);
 hands.onResults(onResults);
-hands.onResults(onResults);
 
 // Find position on screen given hand coordinates
 function normalizeHand(p1, p2, d) {
