@@ -3,6 +3,7 @@ import { OrbitControls } from "https://threejs.org/examples/jsm/controls/OrbitCo
 import { OBJLoader } from 'https://threejs.org/examples/jsm/loaders/OBJLoader.js'
 import { RGBELoader } from 'https://threejs.org/examples/jsm/loaders/RGBELoader.js'
 import { MTLLoader } from 'https://threejs.org/examples/jsm/loaders/MTLLoader.js'
+import clockGeometry from '/three-boilerplate/assets/geometry.js'
 
 import { getPosition, getReady, getTrigger } from './handScript.js'
 // import { render } from 'express/lib/response';
@@ -182,19 +183,29 @@ async function initializeClocks(clocksPerType) {
             clock.type = type.TYPE
             clock.points = type.POINTS
             const mesh = clock.object.children[0]
-            let material = mesh.material[1]
+            if(mesh) {
+                let material = mesh.material[1]
 
-            //Object.assign(material, type.material)
-            material.color = type.material.color
+                Object.assign(material, type.material)
+                material.color = type.material.color
+            } else {
+                const material = new THREE.MeshBasicMaterial( { color: type.material.color } );
+                const geometry = new THREE.BufferGeometry();
+                
+                geometry.setAttribute('position', new THREE.BufferAttribute(Float32Array.from(clockGeometry.position.array), 3))
+                geometry.setAttribute('uv', new THREE.BufferAttribute(Float32Array.from(clockGeometry.uv.array), 3))
+                geometry.setAttribute('normal', new THREE.BufferAttribute(Float32Array.from(clockGeometry.uv.array), 3))
 
+                const mesh = new THREE.Mesh( geometry, material );
+                clock.object.add(mesh)
+            }
             createdObjects.push(clock)
 
             scene.add(clock.object)
             clock.object.position.y = -500
             scene.remove(clock.object)
             
-
-            console.log(createdObjects, material)
+            // console.log(createdObjects, material)
         }
     }
     return true
