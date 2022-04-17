@@ -1,3 +1,8 @@
+@font-face {
+  font-family: 'Ginto Nord Black Italic';
+  src: url('/fonts/ABCGintoNord-BlackItalic-Trial.otf');
+}
+
 @keyframes spin {
   0% {
     transform: rotate(0deg);
@@ -132,8 +137,8 @@ body {
 }
 
 #times-up {
+  font-family: 'Ginto Nord Black Italic';
   position: absolute;
-  display: block;
   width: 100%;
   height: 100vh;
   text-align: center;
@@ -141,17 +146,47 @@ body {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-}
-
-#times-up > span {
-  font-size: 10rem;
+  font-size: 60px;
+  background-color: rgba(255,255,255,0.8);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
   color: red;
-  text-shadow: 2px 2px #000000;
-  width: 50%;
-  border-radius: 1rem;
 }
 
-#times-up > * {
-  width: 50%;
-  background-color: rgba(255, 255, 255, 0.8);
+#times-up .button {
+  padding: 10px;
+  font-size: 20px;
+  font-family: 'Ginto Nord Black Italic';
+
+}
+
+
+.score-field {
+  font-family: 'Ginto Nord Black Italic';
+  display: block;
+  position: absolute;
+  bottom: 100px;
+  left: 10px;
+  background: white;
+  color: rgb(113, 113, 113);
+  font-size: 26px;
+  font-weight: bold;
+  padding: 20px;
+  box-shadow: 0px 4px 4px #00000059;
+  border-radius: 0;
+}
+
+.score-value {
+  color: rgb(47, 47, 47);
+}
+
+.settings-button {
+  font-family: 'Ginto Nord Black Italic';
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  background-color: white;
+  font-weight: bold;
+  border: none;
+  font-size: 16px;
 }

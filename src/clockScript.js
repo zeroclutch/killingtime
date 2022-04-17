@@ -10,7 +10,7 @@ import { getPosition, getReady, getTrigger } from './handScript.js'
 // Add timer
 let frame = 0
 let score = 0
-let time = 60
+let time = 100
 let dirs = [];  // directions
 let parts = []; // particles
 // explosion parameters
@@ -149,10 +149,10 @@ function addObject(object, killAfter) {
     // Adjust params 
     object.killAt = frame + (killAfter || 0)
     object.createdAt = frame
-    object.aX = randomBetween(-0.5, 0.5)
-    object.aY = randomBetween(-0.3, -0.5)
-    object.speed = randomBetween(0.3, 0.4)
-    object.height = Math.round(randomBetween(0, 150))
+    object.aX = randomBetween(-8, 8)
+    object.aY = randomBetween(-0.3, -0.3)
+    object.speed = randomBetween(0.1, 0.5)
+    object.height = Math.round(randomBetween(0, 200))
 
     object.x = 1000
 
@@ -220,6 +220,9 @@ function killClock(i, x, y) {
     setTimeout(() => scene.remove(explosionForClock.object), 750)
 }
 
+let isTriggered = false
+let isReady = true
+let timeElasped = 0
 
 const cursorGeometry = new THREE.SphereGeometry( 5, 32, 16 );
 const cursorMaterial = new THREE.MeshBasicMaterial( { color: 0xffff00 } );
@@ -227,7 +230,7 @@ const cursor = new THREE.Mesh( cursorGeometry, cursorMaterial );
 
 ;(async function() {
     // Create all possible clocks and cache them
-    await initializeClocks(2)
+    await initializeClocks(100)
     // Add a clock of type 0 for 200 frames. If there are no clocks available, this returns false
     console.log(addClock(0, 200))
 
@@ -248,15 +251,16 @@ const cursor = new THREE.Mesh( cursorGeometry, cursorMaterial );
 
         // Set cursor position
         [pointer.x, pointer.y] = getPosition()
-        let isTriggered = getTrigger()
-        moveCursor(pointer.x, pointer.y, isTriggered)
-
+        isTriggered = getTrigger()
+        let actualTrigger = isTriggered // && isReady
+        moveCursor(pointer.x, pointer.y, actualTrigger)
+        
         // Spawn in a new clock
         if(frame % FRAME_DELAY === 0) {
-            console.log(frame)
+            console.log(FRAME_DELAY)
             const clockType = Math.floor(randomBetween(0, CLOCK_TYPES.length))
             console.log(`Adding clock ${clockType} was successful:`, addClock(clockType, 1000))
-            FRAME_DELAY -= 1
+            FRAME_DELAY = Math.max(400 - (timeElasped * 5), 5) // min spawn speed is 5 seconds
         }
 
         // controls.update();
@@ -277,7 +281,7 @@ const cursor = new THREE.Mesh( cursorGeometry, cursorMaterial );
                 updateTime(-5) // Lose 5 second
                 i--
                 continue
-            } else if (collision(object, pointer.x, pointer.y) && isTriggered) { // Else if hit
+            } else if (collision(object, pointer.x, pointer.y) && actualTrigger) {
                 updateScore(object.points)
                 updateTime(4)
                 console.log(object.type)
@@ -289,7 +293,7 @@ const cursor = new THREE.Mesh( cursorGeometry, cursorMaterial );
                 i--
             }
         }
-
+        isReady = !isTriggered
         renderer.render(scene, camera);
     };
     animate();
@@ -443,13 +447,14 @@ function timesUp(isDone=false) {
 }
  
 function renderTime(seconds) {
-    let minutes = (seconds < 60) ? 0 : seconds / 60
+    let minutes = (seconds < 60) ? 0 : Math.floor(seconds / 60)
     let remainingSeconds = (seconds - (minutes * 60)) % 60 
-    document.getElementById("time-field").innerHTML = (seconds < 0) ? "EXPIRED" : `${minutes}:${remainingSeconds < 10 ? '0' + remainingSeconds : remainingSeconds} left`
+    document.getElementById('timer-value').innerHTML = (seconds < 0) ? "EXPIRED" : `${minutes}:${remainingSeconds < 10 ? '0' + remainingSeconds : remainingSeconds}`
 }
 
-decrementTime = setInterval(() => {
+let decrementTime = setInterval(() => {
     if(time > -1) updateTime(-1)
+    timeElasped += 1
 }, 1000)
 
 
@@ -493,3 +498,10 @@ function ExplodeAnimation(x, y, color)
   }
   
 }
+
+function revealOverlay(e) {
+    let isHidden =  document.getElementById("loading-overlay").style.display === "none"
+    document.getElementById("loading-overlay").style.display = isHidden ? "block" : "none"
+}
+
+document.getElementsByClassName("settings-button")[0].addEventListener('click', revealOverlay)
