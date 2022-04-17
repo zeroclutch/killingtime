@@ -22,9 +22,6 @@
 <body>
   <style>
     body {
-      background-image: url('/three-boilerplate/assets/background.png');
-      background-size: cover;
-      background-repeat: no-repeat;
       background-color: #c2d0d4;
     }
     .square-box {
@@ -55,14 +52,13 @@
       left:0;
     }
 
-    #cursor-overlay {
+    #background-video {
       position: absolute;
-      height: 100%;
-      width: 100%;
-      top:0;
+      height: auto;
+      width: 100vw;
       left:0;
-      background-color: rgba(0,0,0,0);
-      z-index: 150;
+      bottom:0;
+      z-index: -1;
     }
 
     .score-field {
@@ -123,7 +119,9 @@
       background-color: rgba(255, 255, 255, 0.5);
     }
   </style>
-
+  <video autoplay muted loop id="background-video">
+    <source src="/bgloop.mp4" type="video/mp4">
+  </video>
   <div id="loading-overlay"></div>
   <canvas id="scene"></canvas>
   <div class="container" style="opacity: 0">
