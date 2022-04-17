@@ -1,25 +1,17 @@
 # Killing Time - LAHacks 2022 submission
 
-## Welcome to Recovery!
+## Welcome to Killing Time!
 
 ----
 
 ## Inspiration
 
-
-Marvel & Star wars
-
-Turning any screen into a touchscreen 3D VR like experience. The technology behind it. Any point to a screen and it will simply work as a mouse. 
-
-
-
-
-
-Three of our team members had family members who had COVID-19. Concerned with their recovery process, we shared with each other advice on how we could help them. What we found to be a universal piece of advice was maintaining a balanced diet high in nutrients. This notion that well-balanced diet can help accelerate the recovery process is what inspired us to make Recovery, an app that helps users with COVID-19 create a meal plan to aid them in fighting the virus. We want to stress that although vaccines are being distributed and cases are declining, the pandemic is still ongoing, and that COVID-19 can still induce serious symptoms.
+When Peter Parker builds his new suit in *Spider-man: Far From Home*, or when Obi-Wan and Anakin strategize their assault on Geonosis in the *Star Wars* universe, these characters all use technologies that interact seamlessly in 3D space with the motions of their hands. With advancements in technologies in machine vision and hand tracking, these technologies of science fiction are slowly becoming less and less fiction. For our project, we use these technologies to create *Killing Time*, a game in which you use your hands as finger guns to shoot clocks that are thrown at you, earning points in a certain amount of time. Unlike how games like *Valorant's* shooting range require peripherals like a mouse to click or how *Fruit Ninja* requires an active touchscreen, *Killing Time* transforms your computer screen into a 3D touchscreen-like and VR-like experience. Any point to a screen and it will simply work as a mouse. 
 
 ## What it does
 
-[Recovery](https://recoveryapp.netlify.app) is a nutrition tracking and analysis progressive web app focused on rehabilitating people from COVID-19 through their diet. Within the app, a user is able to input their weight and sex to create a customized meal plan based on their personal nutrition requirements, [based on the latest medical research](https://www.hss.edu/guide-COVID-19-nutritional-rehabilitation-restore-replenish.asp). Users can scan food items via their barcodes and automatically count their meal progress toward their nutrition goals. For items without barcodes, they can alternatively search for the name of their food and select their item. By pressing analyze items, the user is then able to see their progress based on the items that have been added.
+*Killing Time* is a game which uses machine vision and hand tracking to 
+
 
 ## How we built it
 
@@ -106,16 +98,10 @@ We developed our full UI, incorporating elements of the natural design that we u
 
 ## Built with
 
-* Flask
-* React.js
 * Figma
 * Python
-* SCSS
-* Bulma.io
-* Docker
-* Google Cloud
-* Postman
-* Netlify
+* Javascript
+* Blender
 
 ## The team
 
