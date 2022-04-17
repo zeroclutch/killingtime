@@ -160,6 +160,26 @@ body {
 
 }
 
+
+.score-field {
+  font-family: 'Ginto Nord Black Italic';
+  display: block;
+  position: absolute;
+  bottom: 100px;
+  left: 10px;
+  background: white;
+  color: rgb(113, 113, 113);
+  font-size: 26px;
+  font-weight: bold;
+  padding: 20px;
+  box-shadow: 0px 4px 4px #00000059;
+  border-radius: 0;
+}
+
+.score-value {
+  color: rgb(47, 47, 47);
+}
+
 .settings-button {
   font-family: 'Ginto Nord Black Italic';
   position: absolute;

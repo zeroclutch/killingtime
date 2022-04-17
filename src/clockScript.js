@@ -111,12 +111,12 @@ const OBJECTS = [
 ]
 
 const CLOCK_TYPES = [
-    { TYPE: 0, POINTS: 1, material: { shininess: 10, color: new THREE.Color("rgb(244, 84, 84)"), } },
-    // { TYPE: 1, POINTS: 2, material: { shininess: 10, color: new THREE.Color("rgb(168, 123, 175)"), } },
-    // { TYPE: 2, POINTS: 5, material: { shininess: 10, color: new THREE.Color("rgb(49, 193, 115)"), } },
-    // { TYPE: 3, POINTS: 10, material:{ shininess: 10, color: new THREE.Color("rgb(37, 167, 185)"), } },
-    // { TYPE: 4, POINTS: 25, material:{ shininess: 10, color: new THREE.Color("rgb(255, 203, 70)"), } },
-    { TYPE: 1, POINTS: 0, material:{ shininess: 10, color: new THREE.Color("rgb(0, 0, 0)"), } },
+    { TYPE: 0, POINTS: 1, material: { shininess: 30, color: new THREE.Color("rgb(244, 84, 84)"), } },
+    { TYPE: 1, POINTS: 2, material: { shininess: 30, color: new THREE.Color("rgb(168, 123, 175)"), } },
+    { TYPE: 2, POINTS: 5, material: { shininess: 30, color: new THREE.Color("rgb(49, 193, 115)"), } },
+    { TYPE: 3, POINTS: 10, material:{ shininess: 30, color: new THREE.Color("rgb(37, 167, 185)"), } },
+    { TYPE: 4, POINTS: 25, material:{ shininess: 30, color: new THREE.Color("rgb(255, 203, 70)"), } },
+    { TYPE: 5, POINTS: 0, material:{ shininess: 30, color: new THREE.Color("rgb(0, 0, 0)"), } },
 ]
 
 // Current list of clocks
@@ -204,13 +204,17 @@ function addClock(type, duration=200) {
 function killClock(i, x, y) {
     const object = spawnedObjects[i].object
     scene.remove(object)
-    
+
     const explosionForClock = new ExplodeAnimation(x, y, CLOCK_TYPES[spawnedObjects[i].type].material.color)
     parts.push(explosionForClock)
     scene.add(explosionForClock.object)
     spawnedObjects.splice(i, 1)
 
     console.log('killing clock at', x,y)
+
+    // Play kill sound
+    let sound = new Audio('/clank.mp3');
+    sound.play();
 
     //let explosion = new ExplodeAnimation(x, y)
     setTimeout(() => scene.remove(explosionForClock.object), 750)
@@ -271,7 +275,7 @@ const cursor = new THREE.Mesh( cursorGeometry, cursorMaterial );
             moveParabolic(object.object, object.aX, object.aY, object.height, (frame - object.createdAt - 100),  object.speed)
             rotateObject(object.object)
 
-            if(frame === object.killAt) {
+            if(frame === object.killAt) { // If missed
                 scene.remove(object.object)
                 spawnedObjects.splice(i, 1)
                 updateTime(-5) // Lose 5 second
@@ -281,10 +285,11 @@ const cursor = new THREE.Mesh( cursorGeometry, cursorMaterial );
                 updateScore(object.points)
                 updateTime(4)
                 console.log(object.type)
-                if(object.type > 0) {
+                if(object.type > 4) {
                     time = 0
                 }
                 killClock(i, object.object.position.x, object.object.position.y)
+
                 i--
             }
         }
@@ -444,7 +449,7 @@ function timesUp(isDone=false) {
 function renderTime(seconds) {
     let minutes = (seconds < 60) ? 0 : Math.floor(seconds / 60)
     let remainingSeconds = (seconds - (minutes * 60)) % 60 
-    document.getElementById("time-field").innerHTML = (seconds < 0) ? "EXPIRED" : `${minutes}:${remainingSeconds < 10 ? '0' + remainingSeconds : remainingSeconds} left`
+    document.getElementById('timer-value').innerHTML = (seconds < 0) ? "EXPIRED" : `${minutes}:${remainingSeconds < 10 ? '0' + remainingSeconds : remainingSeconds}`
 }
 
 let decrementTime = setInterval(() => {
@@ -493,3 +498,10 @@ function ExplodeAnimation(x, y, color)
   }
   
 }
+
+function revealOverlay(e) {
+    let isHidden =  document.getElementById("loading-overlay").style.display === "none"
+    document.getElementById("loading-overlay").style.display = isHidden ? "block" : "none"
+}
+
+document.getElementsByClassName("settings-button")[0].addEventListener('click', revealOverlay)
