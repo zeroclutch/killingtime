@@ -16,7 +16,6 @@ When Peter Parker builds his new suit in *Spider-man: Far From Home*, or when Ob
 <p style="text-align: center;">
 <img src="https://github.com/zeroclutch/killingtime/blob/main/images/Background.png">
 <img src="https://raw.githubusercontent.com/zeroclutch/killingtime/main/images/Poster%20(1).png">
-<img src="https://raw.githubusercontent.com/zeroclutch/killingtime/main/images/Poster.png">
 <img src="https://raw.githubusercontent.com/zeroclutch/killingtime/main/images/clock.png">
 </p>
 
