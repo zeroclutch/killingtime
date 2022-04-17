@@ -439,6 +439,7 @@ function updateTime(increment) {
 
 function timesUp(isDone=false) {
     document.getElementById("times-up").style.display = isDone ? "flex" : "hidden"
+    document.getElementById('final-score').innerText = score
 }
  
 function renderTime(seconds) {
