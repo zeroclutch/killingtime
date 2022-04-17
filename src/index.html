@@ -21,6 +21,12 @@
 <!-- partial:index.partial.html -->
 <body>
   <style>
+    body {
+      background-image: url('/three-boilerplate/assets/background.png');
+      background-size: cover;
+      background-repeat: no-repeat;
+      background-color: #c2d0d4;
+    }
     .square-box {
       width: 33%;
       height: 0;
@@ -70,6 +76,38 @@
       font-weight: bold;
       padding: 20px;
       border-radius: 5px;
+      box-shadow: 0px 4px 4px #00000059;
+    }
+
+    .control-panel-entry {
+      background: white;
+      border: none;
+      margin: 10px;
+      border-radius: 5px;
+      box-shadow: 0px 4px 4px #00000059;
+    }
+
+    .control-panel-fps canvas {
+      height: 50px;
+      width: 100%;
+      background-color: #222;
+      border-radius: 5px;
+      margin-top: 0;
+    }
+
+    .dropdown-trigger {
+      border: none;
+    }
+
+    .square-box {
+      transform: scale3d(0.5, 0.5, 1);
+      position: absolute;
+      top: -10%;
+      right: -5%;
+    }
+
+    .viewer-widget-js {
+      transform: scale(2, 2) translate(25%, 25%);
     }
 
     #loading-overlay {
@@ -79,7 +117,6 @@
       left: 0;
       opacity: 1;
       background-color: rgba(255, 255, 255, 0.5);
-      
     }
   </style>
 
