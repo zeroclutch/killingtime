@@ -183,10 +183,14 @@ async function initializeClocks(clocksPerType) {
             clock.type = type.TYPE
             clock.points = type.POINTS
             const mesh = clock.object.children[0]
-            let material = mesh.material[1]
+            if(mesh) {
+                // const material = new THREE.MeshBasicMaterial( { color: type.material.color } );
+                // clock.object.children.push()
+                let material = mesh.material[1]
 
-            //Object.assign(material, type.material)
-            material.color = type.material.color
+                //Object.assign(material, type.material)
+                material.color = type.material.color
+            }
 
             createdObjects.push(clock)
 
@@ -194,8 +198,7 @@ async function initializeClocks(clocksPerType) {
             clock.object.position.y = -500
             scene.remove(clock.object)
             
-
-            console.log(createdObjects, material)
+            // console.log(createdObjects, material)
         }
     }
     return true
