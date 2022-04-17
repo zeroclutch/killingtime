@@ -204,13 +204,17 @@ function addClock(type, duration=200) {
 function killClock(i, x, y) {
     const object = spawnedObjects[i].object
     scene.remove(object)
-    
+
     const explosionForClock = new ExplodeAnimation(x, y, CLOCK_TYPES[spawnedObjects[i].type].material.color)
     parts.push(explosionForClock)
     scene.add(explosionForClock.object)
     spawnedObjects.splice(i, 1)
 
     console.log('killing clock at', x,y)
+
+    // Play kill sound
+    let sound = new Audio('/clank.mp3');
+    sound.play();
 
     //let explosion = new ExplodeAnimation(x, y)
     setTimeout(() => scene.remove(explosionForClock.object), 750)
@@ -267,13 +271,13 @@ const cursor = new THREE.Mesh( cursorGeometry, cursorMaterial );
             moveParabolic(object.object, object.aX, object.aY, object.height, (frame - object.createdAt - 100),  object.speed)
             rotateObject(object.object)
 
-            if(frame === object.killAt) {
+            if(frame === object.killAt) { // If missed
                 scene.remove(object.object)
                 spawnedObjects.splice(i, 1)
                 updateTime(-5) // Lose 5 second
                 i--
                 continue
-            } else if (collision(object, pointer.x, pointer.y) && isTriggered) {
+            } else if (collision(object, pointer.x, pointer.y) && isTriggered) { // Else if hit
                 updateScore(object.points)
                 updateTime(4)
                 console.log(object.type)
@@ -281,6 +285,7 @@ const cursor = new THREE.Mesh( cursorGeometry, cursorMaterial );
                     time = 0
                 }
                 killClock(i, object.object.position.x, object.object.position.y)
+
                 i--
             }
         }
