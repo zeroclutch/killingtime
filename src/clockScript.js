@@ -112,10 +112,10 @@ const OBJECTS = [
 
 const CLOCK_TYPES = [
     { TYPE: 0, POINTS: 1, material: { shininess: 10, color: new THREE.Color("rgb(244, 84, 84)"), } },
-    // { TYPE: 1, POINTS: 2, material: { shininess: 10, color: new THREE.Color("rgb(168, 123, 175)"), } },
-    // { TYPE: 2, POINTS: 5, material: { shininess: 10, color: new THREE.Color("rgb(49, 193, 115)"), } },
-    // { TYPE: 3, POINTS: 10, material:{ shininess: 10, color: new THREE.Color("rgb(37, 167, 185)"), } },
-    // { TYPE: 4, POINTS: 25, material:{ shininess: 10, color: new THREE.Color("rgb(255, 203, 70)"), } },
+    { TYPE: 1, POINTS: 2, material: { shininess: 10, color: new THREE.Color("rgb(168, 123, 175)"), } },
+    { TYPE: 2, POINTS: 5, material: { shininess: 10, color: new THREE.Color("rgb(49, 193, 115)"), } },
+    { TYPE: 3, POINTS: 10, material:{ shininess: 10, color: new THREE.Color("rgb(37, 167, 185)"), } },
+    { TYPE: 4, POINTS: 25, material:{ shininess: 10, color: new THREE.Color("rgb(255, 203, 70)"), } },
     { TYPE: 1, POINTS: 0, material:{ shininess: 10, color: new THREE.Color("rgb(0, 0, 0)"), } },
 ]
 
