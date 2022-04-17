@@ -170,6 +170,7 @@ async function initializeClocks(clocksPerType) {
 
             // Add specific type properties
             clock.type = type.TYPE
+            clock.points = type.POINTS
             const mesh = clock.object.children[0]
             let material = mesh.material[1]
 
@@ -224,10 +225,9 @@ const cursor = new THREE.Mesh( cursorGeometry, cursorMaterial );
     // Animation loop
     let animate = function () {
         requestAnimationFrame( animate );
-        if(!getReady()) return
+        if(!getReady() || time < 0) return
 
         frame++
-
         // Set cursor position
         [pointer.x, pointer.y] = getPosition()
         let isTriggered = getTrigger()
@@ -253,10 +253,13 @@ const cursor = new THREE.Mesh( cursorGeometry, cursorMaterial );
             if(frame === object.killAt) {
                 scene.remove(object.object)
                 spawnedObjects.splice(i, 1)
+                updateTime(-5) // Lose 5 second
                 i--
                 continue
             } else if (collision(object, pointer.x, pointer.y) && isTriggered) {
                 killClock(i, pointer.x, pointer.y)
+                updateScore(object.points)
+                updateTime(4)
                 i--
             }
             
@@ -335,8 +338,6 @@ function collision(object, x, y) {
      x = clamp(x, -1, 1)
      y = clamp(y, -1, 1)
 
-     // 
-
 	 // pointer.x = ( event.clientX / window.innerWidth ) * 2 - 1;
 	 // pointer.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
      // Solve for event.clientX
@@ -395,3 +396,30 @@ function moveCursor(x,y, isTriggered) {
 }
 
 // window.addEventListener( 'pointermove', onPointerMove );
+
+/* Game variables */
+
+let score = 0
+let time = 5
+
+function updateScore(increment) {
+    score += increment
+    document.getElementsByClassName("score-field")[0].innerHTML = 'Score: ' +  score
+}
+
+function updateTime(increment) {
+    console.log(time)
+    time += increment
+    renderTime(time)
+}
+ 
+function renderTime(seconds) {
+    let minutes = (seconds < 60) ? 0 : seconds / 60
+    let remainingSeconds = (seconds - (minutes * 60)) % 60 
+    document.getElementById("time-field").innerHTML = (seconds < 0) ? "EXPIRED" : `${minutes}:${remainingSeconds < 10 ? '0' + remainingSeconds : remainingSeconds} left`
+}
+
+decrementTime = setInterval(() => {
+    if(time > -1) updateTime(-1)
+}, 1000)
+
