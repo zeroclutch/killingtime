@@ -159,7 +159,7 @@ function addObject(object, killAfter) {
 
     object.aX = randomBetween(3, 5) * randomNegative
     object.aY = randomBetween(-0.3, -0.5)
-    object.speed = randomBetween(0.2, 0.5)
+    object.speed = randomBetween(0.1, 0.3)
     object.height = Math.round(randomBetween(0, 150))
 
     object.x = 1000
@@ -311,7 +311,6 @@ const cursor = new THREE.Mesh( cursorGeometry, cursorMaterial );
                     time = 0
                 }
                 killClock(i, object.object.position.x, object.object.position.y)
-
                 i--
             }
         }
