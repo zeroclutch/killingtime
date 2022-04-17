@@ -255,6 +255,7 @@ function killClock(i, x, y) {
             let objectPos = object.object.position
             // console.log(collisionDetection(cursorPos, objectPos)))
             // console.log(render(object))
+            // removes object if collision detected or time runs out
             if(frame === object.killAt || render(object, pointer.x, pointer.y)) {
                 scene.remove(object.object)
                 spawnedObjects.splice(i, 1)
@@ -264,37 +265,33 @@ function killClock(i, x, y) {
             
             moveParabolic(object.object, object.aX, object.aY, object.height, (frame - object.createdAt - 100),  object.speed)
             rotateObject(object.object)
-
-            // Detect collision
-            
         }
     };
     animate();
 })()
 
+// function collisionDetection(vec1, vec2, dist=35) {
+//     // Checks if two objects or vectors collide
+//     // Takes two position vectors (accessible through a spawned object's object.object.pos)
+//     if(!vec1.x || !vec2.x) return false; // Check that both vectors are valid
 
 
-function collisionDetection(vec1, vec2, dist=35) {
-    // Checks if two objects or vectors collide
-    // Takes two position vectors (accessible through a spawned object's object.object.pos)
-    if(!vec1.x || !vec2.x) return false; // Check that both vectors are valid
+//     let xDiff = Math.abs(vec1.x - vec2.x)
+//     let yDiff = Math.abs(vec1.y - vec2.y)
 
+//     let euclidDist = Math.sqrt(Math.pow(xDiff, 2) + Math.pow(yDiff, 2))
 
-    let xDiff = Math.abs(vec1.x - vec2.x)
-    let yDiff = Math.abs(vec1.y - vec2.y)
+//     // TODO: if necessary: determine if z's collide
+//     // TODO: decide if euclidean Dist or just simple xDiff and yDiff is better/easier
 
-    let euclidDist = Math.sqrt(Math.pow(xDiff, 2) + Math.pow(yDiff, 2))
-
-    // TODO: if necessary: determine if z's collide
-    // TODO: decide if euclidean Dist or just simple xDiff and yDiff is better/easier
-
-    // return xDiff < dist && yDiff < dist
-    return euclidDist < dist
-}
+//     // return xDiff < dist && yDiff < dist
+//     return euclidDist < dist
+// }
 
 
 
 // Move parabolically as a function of time
+
 function moveParabolic(object, ax, ay, height, t, speed) {
     t *= speed
     let x = 2 * ax * t, y = ay * t ** 2 + height
@@ -317,18 +314,16 @@ function rotateObject(object, rad) {
 // edmund's workspace
 const raycaster = new THREE.Raycaster();
 const pointer = new THREE.Vector3();
-var vec = new THREE.Vector3(); // create once and reuse
-var cursorPos = new THREE.Vector3(); // create once and reuse
+// var vec = new THREE.Vector3(); // create once and reuse
+// var cursorPos = new THREE.Vector3(); // create once and reuse
 
 function onPointerMove(event) {
 
 	// calculate pointer position in normalized device coordinates
 	// (-1 to +1) for both components
 
-
 	pointer.x = ( event.clientX / window.innerWidth ) * 2 - 1;
 	pointer.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
-
 
     // Different approach from raycasting
 
@@ -363,6 +358,6 @@ function render(object, x, y) {
     return false;
 }
 
-window.addEventListener( 'mousemove', onPointerMove );
+window.addEventListener( 'pointermove', onPointerMove );
 
 window.requestAnimationFrame(render);
