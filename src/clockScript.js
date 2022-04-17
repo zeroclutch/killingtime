@@ -444,7 +444,7 @@ function timesUp(isDone=false) {
 function renderTime(seconds) {
     let minutes = (seconds < 60) ? 0 : Math.floor(seconds / 60)
     let remainingSeconds = (seconds - (minutes * 60)) % 60 
-    document.getElementById("time-field").innerHTML = (seconds < 0) ? "EXPIRED" : `${minutes}:${remainingSeconds < 10 ? '0' + remainingSeconds : remainingSeconds} left`
+    document.getElementById('timer-value').innerHTML = (seconds < 0) ? "EXPIRED" : `${minutes}:${remainingSeconds < 10 ? '0' + remainingSeconds : remainingSeconds}`
 }
 
 let decrementTime = setInterval(() => {
@@ -493,3 +493,10 @@ function ExplodeAnimation(x, y, color)
   }
   
 }
+
+function revealOverlay(e) {
+    let isHidden =  document.getElementById("loading-overlay").style.display === "none"
+    document.getElementById("loading-overlay").style.display = isHidden ? "block" : "none"
+}
+
+document.getElementsByClassName("settings-button")[0].addEventListener('click', revealOverlay)
