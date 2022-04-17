@@ -73,6 +73,7 @@ let isReady = true
 
 let avgX = 0, avgY = 0
 let isTriggered = false
+let isGameReady = false
 
 export function getPosition() {
     return [avgX, avgY]
@@ -82,7 +83,12 @@ export function getTrigger() {
     return isTriggered
 }
 
+export function getReady() {
+    return isGameReady
+}
+
 function onResults(results) {
+    isGameReady = true
     // Hide the spinner.
     document.body.classList.add('loaded');
     // Update the frame rate.

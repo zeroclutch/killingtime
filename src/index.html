@@ -58,11 +58,34 @@
       background-color: rgba(0,0,0,0);
       z-index: 150;
     }
+
+    .score-field {
+      display: block;
+      position: absolute;
+      bottom: 10px;
+      left: 10px;
+      background: white;
+      color: #333;
+      font-size: 36px;
+      font-weight: bold;
+      padding: 20px;
+      border-radius: 5px;
+    }
+
+    #loading-overlay {
+      display: none;
+      position: absolute;
+      top: 0;
+      left: 0;
+      opacity: 1;
+      background-color: rgba(255, 255, 255, 0.5);
+      
+    }
   </style>
-  <div id="cursor"></div>
-  <!-- <canvas id="cursor-overlay"></canvas> -->
+
+  <div id="loading-overlay"></div>
   <canvas id="scene"></canvas>
-  <div class="container" style="opacity: 0.3">
+  <div class="container" style="opacity: 0">
     <video class="input_video"></video>
     <canvas class="output_canvas" width="1280px" height="720px"></canvas>
     <div class="loading">
@@ -81,7 +104,9 @@
     <div class="landmark-grid-container">
     </div>
   </div>
-  
+  <div class="score-field">
+    0:00 left
+  </div>
   <script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
   <script type="importmap">
   {

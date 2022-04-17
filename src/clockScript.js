@@ -4,7 +4,7 @@ import { OBJLoader } from 'https://threejs.org/examples/jsm/loaders/OBJLoader.js
 import { RGBELoader } from 'https://threejs.org/examples/jsm/loaders/RGBELoader.js'
 import { MTLLoader } from 'https://threejs.org/examples/jsm/loaders/MTLLoader.js'
 
-import { getPosition, getTrigger } from './handScript.js'
+import { getPosition, getReady, getTrigger } from './handScript.js'
 
 // Add timer
 let frame = 0
@@ -223,8 +223,8 @@ const cursor = new THREE.Mesh( cursorGeometry, cursorMaterial );
     scene.add( cursor );
     // Animation loop
     let animate = function () {
-
         requestAnimationFrame( animate );
+        if(!getReady()) return
 
         frame++
 
@@ -332,26 +332,28 @@ function clamp(a, min, max) {
 
 
 function collision(object, x, y) {
-    x = clamp(x, -1, 1)
-    y = clamp(y, -1, 1)
-    
-    // 
-    
-	// pointer.x = ( event.clientX / window.innerWidth ) * 2 - 1;
-	// pointer.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
-    // Solve for event.clientX
-    let pointer = new THREE.Vector2(x, y)
-	// update the picking ray with the camera and pointer position
-	raycaster.setFromCamera( pointer, camera );
+     x = clamp(x, -1, 1)
+     y = clamp(y, -1, 1)
 
-	// calculate objects intersecting the picking ray
-	const intersects = raycaster.intersectObjects( scene.children );
+     // 
 
-	for ( let i = 0; i < intersects.length; i ++ ) {
-        if(intersects[i].object == object.object.children[0]) return intersects[i].object;
-	}
+	 // pointer.x = ( event.clientX / window.innerWidth ) * 2 - 1;
+	 // pointer.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
+     // Solve for event.clientX
+     let pointer = new THREE.Vector2(x, y)
+	 // update the picking ray with the camera and pointer position
+	 raycaster.setFromCamera( pointer, camera );
 
-    return false;
+	 // calculate objects intersecting the picking ray
+	 const intersects = raycaster.intersectObjects( scene.children );
+
+	 for ( let i = 0; i < intersects.length; i ++ ) {
+         if(intersects[i].object == object.object.children[0]) return intersects[i].object;
+	 }
+
+    //return detectCollisionCubes(cursor, object)
+
+     return false;
 }
 
 function moveCursor(x,y, isTriggered) {
