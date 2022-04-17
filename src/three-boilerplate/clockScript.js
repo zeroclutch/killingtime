@@ -24,16 +24,16 @@ controls.enableDamping = true;
 controls.dampingFactor = 0.25;
 controls.enableZoom = true;
 
-let keyLight = new THREE.DirectionalLight(new THREE.Color('hsl(30, 100%, 75%)'), 1.0);
+let keyLight = new THREE.DirectionalLight(new THREE.Color('hsl(30, 100%, 75%)'), 0.75);
 keyLight.position.set(-100, 0, 100);
 
-let fillLight = new THREE.DirectionalLight(new THREE.Color('hsl(240, 100%, 75%)'), 0.75);
+let fillLight = new THREE.DirectionalLight(new THREE.Color('hsl(240, 100%, 75%)'), 0.6);
 fillLight.position.set(100, 0, 100);
 
-let backLight = new THREE.DirectionalLight(0xffffff, 1.0);
+let backLight = new THREE.DirectionalLight(0xFFB35C, 1.0);
 backLight.position.set(100, 0, -100).normalize();
 
-const light = new THREE.AmbientLight( 0x404040, 1.75 ); // soft white light
+const light = new THREE.AmbientLight( 0x424242, 1.75 ); // soft white light
 
 // Add lighting
 scene.add( light );
@@ -105,7 +105,8 @@ const CLOCK_TYPES = [
     { TYPE: 0, POINTS: 1, material: { shininess: 10, color: new THREE.Color("rgb(244, 84, 84)"), } },
     { TYPE: 1, POINTS: 2, material: { shininess: 10, color: new THREE.Color("rgb(168, 123, 175)"), } },
     { TYPE: 2, POINTS: 5, material: { shininess: 10, color: new THREE.Color("rgb(49, 193, 115)"), } },
-    { TYPE: 3, POINTS: 10, material:{ shininess: 10, color: new THREE.Color("rgb(255, 203, 70)"), } },
+    { TYPE: 3, POINTS: 10, material:{ shininess: 10, color: new THREE.Color("rgb(37, 167, 185)"), } },
+    { TYPE: 4, POINTS: 25, material:{ shininess: 10, color: new THREE.Color("rgb(255, 203, 70)"), } },
 ]
 
 // Current list of clocks
