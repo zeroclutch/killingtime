@@ -11,15 +11,15 @@ let frame = 0
 
 // Initialize scene and renderer
 let scene = new THREE.Scene();
-scene.background = new THREE.Color( 0xC2D0D4 )
 
 let camera = new THREE.PerspectiveCamera( 75, window.innerWidth/window.innerHeight, 0.1, 10000 );
 camera.position.z = 200;
 
 const gameCanvas = document.getElementById('scene')
 
-let renderer = new THREE.WebGLRenderer( { canvas: gameCanvas } );
+let renderer = new THREE.WebGLRenderer( { canvas: gameCanvas, alpha: true } );
 renderer.setSize( window.innerWidth, window.innerHeight );
+renderer.setClearColor( 0x000000, 0 );
 // let ctx = renderer.getContext()
 // // console.log(ctx)
 
@@ -340,7 +340,7 @@ function collision(object, x, y) {
 	 // pointer.x = ( event.clientX / window.innerWidth ) * 2 - 1;
 	 // pointer.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
      // Solve for event.clientX
-     let pointer = new THREE.Vector2(x, y)
+     let pointer = new THREE.Vector2(x, -y)
 	 // update the picking ray with the camera and pointer position
 	 raycaster.setFromCamera( pointer, camera );
 
