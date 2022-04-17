@@ -22,9 +22,6 @@
 <body>
   <style>
     body {
-      background-image: url('/three-boilerplate/assets/background.png');
-      background-size: cover;
-      background-repeat: no-repeat;
       background-color: #c2d0d4;
     }
     .square-box {
@@ -55,20 +52,19 @@
       left:0;
     }
 
-    #cursor-overlay {
+    #background-video {
       position: absolute;
-      height: 100%;
-      width: 100%;
-      top:0;
+      height: auto;
+      width: 100vw;
       left:0;
-      background-color: rgba(0,0,0,0);
-      z-index: 150;
+      bottom:0;
+      z-index: -1;
     }
 
     .score-field {
       display: block;
       position: absolute;
-      bottom: 10px;
+      bottom: 100px;
       left: 10px;
       background: white;
       color: #333;
@@ -77,6 +73,10 @@
       padding: 20px;
       border-radius: 5px;
       box-shadow: 0px 4px 4px #00000059;
+    }
+
+    #time-field {
+      bottom: 10px;
     }
 
     .control-panel-entry {
@@ -119,7 +119,9 @@
       background-color: rgba(255, 255, 255, 0.5);
     }
   </style>
-
+  <video autoplay muted loop id="background-video">
+    <source src="/bgloop.mp4" type="video/mp4">
+  </video>
   <div id="loading-overlay"></div>
   <canvas id="scene"></canvas>
   <div class="container" style="opacity: 0">
@@ -142,6 +144,15 @@
     </div>
   </div>
   <div class="score-field">
+    Score: 0
+  </div>
+  <div id="times-up">
+    <span>
+      TIMES UP!
+    </span>
+    <button>Play Again</button>
+  </div>
+  <div class="score-field" id="time-field">
     0:00 left
   </div>
   <script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>

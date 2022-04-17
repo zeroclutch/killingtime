@@ -9,6 +9,14 @@ import { getPosition, getReady, getTrigger } from './handScript.js'
 
 // Add timer
 let frame = 0
+let score = 0
+let time = 60
+let dirs = [];  // directions
+let parts = []; // particles
+// explosion parameters
+let movementSpeed = 35;
+let totalObjects = 500;
+let objectSize = 3;
 
 // Initialize scene and renderer
 let scene = new THREE.Scene();
@@ -104,10 +112,11 @@ const OBJECTS = [
 
 const CLOCK_TYPES = [
     { TYPE: 0, POINTS: 1, material: { shininess: 10, color: new THREE.Color("rgb(244, 84, 84)"), } },
-    { TYPE: 1, POINTS: 2, material: { shininess: 10, color: new THREE.Color("rgb(168, 123, 175)"), } },
-    { TYPE: 2, POINTS: 5, material: { shininess: 10, color: new THREE.Color("rgb(49, 193, 115)"), } },
-    { TYPE: 3, POINTS: 10, material:{ shininess: 10, color: new THREE.Color("rgb(37, 167, 185)"), } },
-    { TYPE: 4, POINTS: 25, material:{ shininess: 10, color: new THREE.Color("rgb(255, 203, 70)"), } },
+    // { TYPE: 1, POINTS: 2, material: { shininess: 10, color: new THREE.Color("rgb(168, 123, 175)"), } },
+    // { TYPE: 2, POINTS: 5, material: { shininess: 10, color: new THREE.Color("rgb(49, 193, 115)"), } },
+    // { TYPE: 3, POINTS: 10, material:{ shininess: 10, color: new THREE.Color("rgb(37, 167, 185)"), } },
+    // { TYPE: 4, POINTS: 25, material:{ shininess: 10, color: new THREE.Color("rgb(255, 203, 70)"), } },
+    { TYPE: 1, POINTS: 0, material:{ shininess: 10, color: new THREE.Color("rgb(0, 0, 0)"), } },
 ]
 
 // Current list of clocks
@@ -164,6 +173,7 @@ async function initializeClocks(clocksPerType) {
 
             // Add specific type properties
             clock.type = type.TYPE
+            clock.points = type.POINTS
             const mesh = clock.object.children[0]
             let material = mesh.material[1]
 
@@ -223,7 +233,7 @@ const cursor = new THREE.Mesh( cursorGeometry, cursorMaterial );
     // Animation loop
     let animate = function () {
         requestAnimationFrame( animate );
-        if(!getReady()) return
+        if(!getReady() || time < 0) return
 
         frame++
 
@@ -260,9 +270,16 @@ const cursor = new THREE.Mesh( cursorGeometry, cursorMaterial );
             if(frame === object.killAt) {
                 scene.remove(object.object)
                 spawnedObjects.splice(i, 1)
+                updateTime(-5) // Lose 5 second
                 i--
                 continue
             } else if (collision(object, pointer.x, pointer.y) && isTriggered) {
+                updateScore(object.points)
+                updateTime(4)
+                console.log(object.type)
+                if(object.type > 0) {
+                    time = 0
+                }
                 killClock(i, object.object.position.x, object.object.position.y)
                 i--
             }
@@ -340,8 +357,6 @@ function collision(object, x, y) {
      x = clamp(x, -1, 1)
      y = clamp(y, -1, 1)
 
-     // 
-
 	 // pointer.x = ( event.clientX / window.innerWidth ) * 2 - 1;
 	 // pointer.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
      // Solve for event.clientX
@@ -401,12 +416,38 @@ function moveCursor(x,y, isTriggered) {
 
 // window.addEventListener( 'pointermove', onPointerMove );
 
-let dirs = [];  // directions
-let parts = []; // particles
-// explosion parameters
-let movementSpeed = 35;
-let totalObjects = 500;
-let objectSize = 3;
+/* Game functions */
+
+
+
+function updateScore(increment) {
+    score += increment
+    document.getElementsByClassName("score-field")[0].innerHTML = 'Score: ' +  score
+}
+
+function updateTime(increment) {
+    time += increment
+    renderTime(time)
+    if(time < 0) {
+        timesUp(true)
+    }
+}
+
+function timesUp(isDone=false) {
+    document.getElementById("times-up").style.display = isDone ? "flex" : "hidden"
+}
+ 
+function renderTime(seconds) {
+    let minutes = (seconds < 60) ? 0 : seconds / 60
+    let remainingSeconds = (seconds - (minutes * 60)) % 60 
+    document.getElementById("time-field").innerHTML = (seconds < 0) ? "EXPIRED" : `${minutes}:${remainingSeconds < 10 ? '0' + remainingSeconds : remainingSeconds} left`
+}
+
+decrementTime = setInterval(() => {
+    if(time > -1) updateTime(-1)
+}, 1000)
+
+
 
 function ExplodeAnimation(x, y, color)
 {
