@@ -192,15 +192,18 @@ function addClock(type, duration=200) {
 }
 
 function killClock(i, x, y) {
-    scene.remove(spawnedObjects[i].object)
-    spawnedObjects.push(new ExplodeAnimation(x, y))
-    render();
+    const object = spawnedObjects[i].object
+    scene.remove(object)
+    
+    const explosionForClock = new ExplodeAnimation(x, y, CLOCK_TYPES[spawnedObjects[i].type].material.color)
+    parts.push(explosionForClock)
+    scene.add(explosionForClock.object)
     spawnedObjects.splice(i, 1)
 
     console.log('killing clock at', x,y)
 
     //let explosion = new ExplodeAnimation(x, y)
-    //setTimeout(() => scene.remove(explosion.object), 1000)
+    setTimeout(() => scene.remove(explosionForClock.object), 750)
 }
 
 
@@ -224,6 +227,11 @@ const cursor = new THREE.Mesh( cursorGeometry, cursorMaterial );
 
         frame++
 
+        let pCount = parts.length;
+        while(pCount--) {
+            parts[pCount].update();
+        }
+
         // Set cursor position
         [pointer.x, pointer.y] = getPosition()
         let isTriggered = getTrigger()
@@ -242,22 +250,22 @@ const cursor = new THREE.Mesh( cursorGeometry, cursorMaterial );
         // Spawns an moves
         for(let i in spawnedObjects) {
             let object = spawnedObjects[i]
-            let objectPos = object.object.position
+            // let objectPos = object.object.position
             // console.log(collisionDetection(cursorPos, objectPos)))
             // console.log(render(object))
             // removes object if collision detected or time runs out
+            moveParabolic(object.object, object.aX, object.aY, object.height, (frame - object.createdAt - 100),  object.speed)
+            rotateObject(object.object)
+
             if(frame === object.killAt) {
                 scene.remove(object.object)
                 spawnedObjects.splice(i, 1)
                 i--
                 continue
             } else if (collision(object, pointer.x, pointer.y) && isTriggered) {
-                killClock(i, pointer.x, pointer.y)
+                killClock(i, object.object.position.x, object.object.position.y)
                 i--
             }
-            
-            moveParabolic(object.object, object.aX, object.aY, object.height, (frame - object.createdAt - 100),  object.speed)
-            rotateObject(object.object)
         }
 
         renderer.render(scene, camera);
@@ -309,6 +317,7 @@ function rotateObject(object, rad) {
 // edmund's workspace
 const raycaster = new THREE.Raycaster();
 const pointer = new THREE.Vector3();
+const client = { x: 0, y: 0 }
 // var vec = new THREE.Vector3(); // create once and reuse
 // var cursorPos = new THREE.Vector3(); // create once and reuse
 
@@ -355,8 +364,8 @@ function collision(object, x, y) {
 function moveCursor(x,y, isTriggered) {
     
     
-    let clientX = (pointer.x + 1) / 2 * window.innerWidth
-    let clientY = -(pointer.y + 1) / 2 * window.innerHeight
+    client.x = (pointer.x + 1) / 2 * window.innerWidth
+    client.y = -(pointer.y + 1) / 2 * window.innerHeight
 
     // cursor.style.left = Math.round(clientX) + 'px'
     // cursor.style.top = Math.round(-clientY) + 'px'
@@ -392,39 +401,27 @@ function moveCursor(x,y, isTriggered) {
 
 // window.addEventListener( 'pointermove', onPointerMove );
 
-var dirs = [];
-var parts = [];
-var movementSpeed = 50;
-var totalObjects = 1000;
-var objectSize = 10;
-var colors = [0xFF0FFF, 0xCCFF00, 0xFF000F, 0x996600, 0xFFFFFF];
+let dirs = [];  // directions
+let parts = []; // particles
+// explosion parameters
+let movementSpeed = 35;
+let totalObjects = 500;
+let objectSize = 3;
 
-function render() {
-    requestAnimationFrame(render);
-    var pCount = parts.length;
-    while(pCount--) {
-        parts[pCount].update();
-    }
-
-    renderer.render( scene, camera );
-
-}
-
-function ExplodeAnimation(x,y)
+function ExplodeAnimation(x, y, color)
 {
-  var geometry = new THREE.BufferGeometry();
-  
+  let geometry = new THREE.BufferGeometry();
+  const vertices = new Array();
   for (let i = 0; i < totalObjects; i ++) { 
-    var vertex = new THREE.Vector3();
-    vertex.x = x;
-    vertex.y = y;
-    vertex.z = 0;
+     vertices.push(x, y, 0)
   
-    geometry.setAttribute('position', new THREE.BufferAttribute(vertex));
     dirs.push({x:(Math.random() * movementSpeed)-(movementSpeed/2),y:(Math.random() * movementSpeed)-(movementSpeed/2),z:(Math.random() * movementSpeed)-(movementSpeed/2)});
   }
-  var material = new THREE.ParticleBasicMaterial( { size: objectSize,  color: colors[Math.round(Math.random() * colors.length)] });
-  var particles = new THREE.ParticleSystem( geometry, material );
+  const float32Vertices = Float32Array.from(vertices)
+
+  geometry.setAttribute('position', new THREE.BufferAttribute(float32Vertices, 3));
+  let material = new THREE.PointsMaterial( { size: objectSize, color });
+  let particles = new THREE.Points( geometry, material );
   
   this.object = particles;
   this.status = true;
@@ -433,18 +430,19 @@ function ExplodeAnimation(x,y)
   this.yDir = (Math.random() * movementSpeed)-(movementSpeed/2);
   this.zDir = (Math.random() * movementSpeed)-(movementSpeed/2);
   
-  addObject(this.object, 10)
-  
   this.update = function(){
     if (this.status == true){
-      var pCount = totalObjects;
-      while(pCount--) {
-        var particle =  this.object.geometry.vertices[pCount]
-        particle.y += dirs[pCount].y;
-        particle.x += dirs[pCount].x;
-        particle.z += dirs[pCount].z;
+      let pCount = totalObjects;
+      let particles =  this.object.geometry.getAttribute('position').array // THREE.BufferAttribute(float32Vertices, 3)
+    //   console.log(this.object.geometry.getAttribute('position'))
+      for(let i = 0; i < particles.length; i += 3) {
+        pCount--
+        particles[i] += dirs[pCount].x;
+        particles[i + 1] += dirs[pCount].y;
+        particles[i + 2] += dirs[pCount].z;
       }
-      this.object.geometry.verticesNeedUpdate = true;
+      this.object.geometry.setAttribute('position', new THREE.BufferAttribute(particles, 3))
+      this.object.geometry.needsUpdate = true;
     }
   }
   
