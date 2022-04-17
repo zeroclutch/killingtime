@@ -18,6 +18,10 @@ let movementSpeed = 35;
 let totalObjects = 500;
 let objectSize = 3;
 
+// Hit sound
+let sound = new Audio('/clank.mp3');
+sound.load()
+
 // Initialize scene and renderer
 let scene = new THREE.Scene();
 
@@ -227,7 +231,6 @@ function killClock(i, x, y) {
     console.log('killing clock at', x,y)
 
     // Play kill sound
-    let sound = new Audio('/clank.mp3');
     sound.play();
 
     //let explosion = new ExplodeAnimation(x, y)
