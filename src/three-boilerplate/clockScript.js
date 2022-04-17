@@ -87,42 +87,6 @@ const loadObj = (objPath, mtlPath) => {
 
 function ExplodeAnimation(x,y)
 {
-  var geometry = new THREE.Geometry();
-  
-  for (i = 0; i < totalObjects; i ++) 
-  { 
-    var vertex = new THREE.Vector3();
-    vertex.x = x;
-    vertex.y = y;
-    vertex.z = 0;
-  
-    geometry.vertices.push( vertex );
-    dirs.push({x:(Math.random() * movementSpeed)-(movementSpeed/2),y:(Math.random() * movementSpeed)-(movementSpeed/2),z:(Math.random() * movementSpeed)-(movementSpeed/2)});
-  }
-  var material = new THREE.ParticleBasicMaterial( { size: objectSize,  color: colors[Math.round(Math.random() * colors.length)] });
-  var particles = new THREE.ParticleSystem( geometry, material );
-  
-  this.object = particles;
-  this.status = true;
-  
-  this.xDir = (Math.random() * movementSpeed)-(movementSpeed/2);
-  this.yDir = (Math.random() * movementSpeed)-(movementSpeed/2);
-  this.zDir = (Math.random() * movementSpeed)-(movementSpeed/2);
-  
-  scene.add( this.object  ); 
-  
-  this.update = function(){
-    if (this.status == true){
-      var pCount = totalObjects;
-      while(pCount--) {
-        var particle =  this.object.geometry.vertices[pCount]
-        particle.y += dirs[pCount].y;
-        particle.x += dirs[pCount].x;
-        particle.z += dirs[pCount].z;
-      }
-      this.object.geometry.verticesNeedUpdate = true;
-    }
-  }
   
 }
 
@@ -138,9 +102,9 @@ const OBJECTS = [
 ]
 
 const CLOCK_TYPES = [
-    { TYPE: 0, material: { shininess: 50, specular: new THREE.Color(0x888888), color: new THREE.Color( 0xA2DFA8 ) } },
-    { TYPE: 1, POINTS: 5, material: { shininess: 50, specular: new THREE.Color(0x888888), color: new THREE.Color( 0xA669F4 ) } },
-    { TYPE: 2, POINTS: 5, material: { shininess: 50, specular: new THREE.Color(0x888888), color: new THREE.Color( 0xFFB76E ) } },
+    { TYPE: 0, POINTS: 5, material: { shininess: 10, color: new THREE.Color( 1, 0, 0 ),    } },
+    { TYPE: 1, POINTS: 5, material: { shininess: 10, color: new THREE.Color( 1, 0, 0 ), } },
+    { TYPE: 2, POINTS: 5, material: { shininess: 10, color: new THREE.Color( 1, 0, 0 ),  } },
 ]
 
 // Current list of clocks
@@ -225,9 +189,11 @@ function addClock(type, duration=200) {
 }
 
 function killClock(i, x, y) {
+    scene.remove(spawnedObjects[i].object)
     spawnedObjects.splice(i, 1)
-    let explosion = new ExplodeAnimation(x, y)
-    setTimeout(() => scene.remove(explosion.object), 1000)
+
+    //let explosion = new ExplodeAnimation(x, y)
+    //setTimeout(() => scene.remove(explosion.object), 1000)
 }
 
 ;(async function() {
@@ -252,7 +218,6 @@ function killClock(i, x, y) {
         }
 
         // controls.update();
-        renderer.render(scene, camera);
         
         // Spawns an moves
         for(let i in spawnedObjects) {
@@ -261,16 +226,21 @@ function killClock(i, x, y) {
             // console.log(collisionDetection(cursorPos, objectPos)))
             // console.log(render(object))
             // removes object if collision detected or time runs out
-            if(frame === object.killAt || render(object, pointer.x, pointer.y)) {
+            if(frame === object.killAt) {
                 scene.remove(object.object)
                 spawnedObjects.splice(i, 1)
                 i--
                 continue
+            } else if (collision(object, pointer.x, pointer.y)) {
+                killClock(i, pointer.x, pointer.y)
+                i--
             }
             
             moveParabolic(object.object, object.aX, object.aY, object.height, (frame - object.createdAt - 100),  object.speed)
             rotateObject(object.object)
         }
+
+        renderer.render(scene, camera);
     };
     animate();
 })()
@@ -329,24 +299,9 @@ function onPointerMove(event) {
 
 	pointer.x = ( event.clientX / window.innerWidth ) * 2 - 1;
 	pointer.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
-
-    // Different approach from raycasting
-
-    // vec.set(
-    //     ( event.clientX / window.innerWidth ) * 2 - 1,
-    //     - ( event.clientY / window.innerHeight ) * 2 + 1,
-    //     0.5 );
-
-    // vec.unproject( camera );
-
-    // vec.sub( camera.position ).normalize();
-
-    // var distance = - camera.position.z / vec.z;
-
-    // cursorPos.copy( camera.position ).add( vec.multiplyScalar( distance ) );
 }
 
-function render(object, x, y) {
+function collision(object, x, y) {
 
     let pointer = new THREE.Vector2(x, y)
 
