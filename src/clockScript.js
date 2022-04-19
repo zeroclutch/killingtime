@@ -1,5 +1,4 @@
 import * as THREE from 'three';
-import { OrbitControls } from "https://threejs.org/examples/jsm/controls/OrbitControls.js"
 import { OBJLoader } from 'https://threejs.org/examples/jsm/loaders/OBJLoader.js'
 import { RGBELoader } from 'https://threejs.org/examples/jsm/loaders/RGBELoader.js'
 import { MTLLoader } from 'https://threejs.org/examples/jsm/loaders/MTLLoader.js'
@@ -10,6 +9,10 @@ import { getPosition, getReady, getTrigger } from './handScript.js'
 
 // Add timer
 let frame = 0
+let start = Date.now()
+const TARGET_FPS = 60
+let getTime = () => Math.floor((Date.now - start) / 1000 * TARGET_FPS)
+
 let score = 0
 let time = 100
 let dirs = [];  // directions
@@ -34,16 +37,6 @@ const gameCanvas = document.getElementById('scene')
 let renderer = new THREE.WebGLRenderer( { canvas: gameCanvas, alpha: true } );
 renderer.setSize( window.innerWidth, window.innerHeight );
 renderer.setClearColor( 0x000000, 0 );
-// let ctx = renderer.getContext()
-// // console.log(ctx)
-
-
-
-// Allow draggable controls
-let controls = {} // new OrbitControls(camera, renderer.domElement); // Disable orbit controls
-controls.enableDamping = true;
-controls.dampingFactor = 0.25;
-controls.enableZoom = true;
 
 let keyLight = new THREE.DirectionalLight(new THREE.Color('hsl(30, 100%, 75%)'), 0.75);
 keyLight.position.set(-100, 0, 100);
@@ -141,8 +134,8 @@ async function createObject(options) {
     object.scale.z = data.scaleZ
 
     // Add some metadata about the object
-    let createdAt = frame
-    let killAt = frame + (options.killAfter || -1) 
+    let createdAt = getTime()
+    let killAt = getTime() + (options.killAfter || -1) 
     return { object, createdAt, killAt }
 }
 
@@ -152,8 +145,8 @@ function randomBetween(a, b) {
 
 function addObject(object, killAfter) {
     // Adjust params 
-    object.killAt = frame + (killAfter || 0)
-    object.createdAt = frame
+    object.killAt = getTime() + (killAfter || 0)
+    object.createdAt = getTime()
 
     let randomNegative = Math.random() > 0.5 ? -1 : 1
 
@@ -284,22 +277,20 @@ const cursor = new THREE.Mesh( cursorGeometry, cursorMaterial );
         moveCursor(pointer.x, pointer.y, actualTrigger)
         
         // Spawn in a new clock
-        if(frame % FRAME_DELAY === 0) {
+        if(getTime() % FRAME_DELAY === 0) {
             console.log(FRAME_DELAY)
             const clockType = Math.floor(randomBetween(0, CLOCK_TYPES.length))
             console.log(`Adding clock ${clockType} was successful:`, addClock(selectClockType(), 1000))
             FRAME_DELAY = Math.max(400 - (timeElapsed * 5), 20) // min spawn speed is 20 frames
         }
-
-        // controls.update();
         
         // Spawns an moves
         for(let i in spawnedObjects) {
             let object = spawnedObjects[i]
-            moveParabolic(object.object, object.aX, object.aY, object.height, (frame - object.createdAt - 100),  object.speed)
+            moveParabolic(object.object, object.aX, object.aY, object.height, (getTime() - object.createdAt - 100),  object.speed)
             rotateObject(object.object)
 
-            if(frame === object.killAt) { // If missed
+            if(getTime() === object.killAt) { // If missed
                 scene.remove(object.object)
                 spawnedObjects.splice(i, 1)
                 updateTime(-5) // Lose 5 second
@@ -382,8 +373,6 @@ function collision(object, x, y) {
 	 for ( let i = 0; i < intersects.length; i ++ ) {
          if(intersects[i].object == object.object.children[0]) return intersects[i].object;
 	 }
-
-    //return detectCollisionCubes(cursor, object)
 
      return false;
 }
