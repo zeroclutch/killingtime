@@ -11,7 +11,7 @@ import { getPosition, getReady, getTrigger } from './handScript.js'
 let frame = 0
 let start = Date.now()
 const TARGET_FPS = 60
-let getTime = () => Math.floor((Date.now - start) / 1000 * TARGET_FPS)
+let getTime = () => Math.floor((Date.now() - start) / 1000 * TARGET_FPS)
 
 let score = 0
 let time = 100
